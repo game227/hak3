@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mijozni Check-in Qilish — B2B Panel{% endblock %}
+
+{% block content %}
+<div class="container py-5 max-w-xl mx-auto">
+    <div class="qs-card p-4 p-md-5">
+        <h3 class="text-white mb-2"><i class="bi bi-qr-code-scan text-emerald-400 me-2"></i>Mijozni Qabul Qilish (Check-in)</h3>
+        <p class="text-muted small mb-4">Mijozning booking kodini kiriting (#QS-XXXXXX) yoki skaner qiling.</p>
+
+        <!-- Search Code Form -->
+        <form method="GET" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="code" value="{{ code }}" class="form-control" placeholder="QS-998877" required>
+                <button type="submit" class="btn btn-qs-primary">
+                    <i class="bi bi-search me-1"></i> Qidirish
+                </button>
+            </div>
+        </form>
+
+        {% if booking %}
+        <div class="p-4 bg-slate-900 border border-emerald-800/60 rounded-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800 fs-6">
+                    #{{ booking.booking_code }}
+                </span>
+                <span class="badge {{ booking.status_badge_class }}">{{ booking.get_status_display }}</span>
+            </div>
+
+            <h4 class="text-white mb-1">{{ booking.user.first_name|default:booking.user.username }}</h4>
+            <p class="text-muted small mb-3">Tel: {{ booking.user.phone_number|default:'Ko‘rsatilmagan' }} | @{{ booking.user.username }}</p>
+
+            <div class="row g-2 small text-slate-300 mb-3">
+                <div class="col-6"><strong>Joy:</strong> {{ booking.location.name }}</div>
+                <div class="col-6"><strong>Stol:</strong> {% if booking.table %}#{{ booking.table.table_number }} ({{ booking.zone.name }}){% else %}Umumiy{% endif %}</div>
+                <div class="col-6"><strong>Sana:</strong> {{ booking.booking_date|date:"d.m.Y" }}</div>
+                <div class="col-6"><strong>Vaqt:</strong> {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}</div>
+            </div>
+
+            {% if booking.status == 'confirmed' %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">
+                    <i class="bi bi-check2-circle me-1"></i> CHECK-IN NI TASDIQLASH
+                </button>
+            </form>
+            {% elif booking.status == 'checked_in' %}
+            <div class="alert alert-info mb-0 text-center">
+                <i class="bi bi-check-all me-1"></i> Ushbu mijoz allaqachon check-in qilgan.
+            </div>
+            {% else %}
+            <div class="alert alert-warning mb-0 text-center">
+                Ushbu buyurtma holati: {{ booking.get_status_display }}
+            </div>
+            {% endif %}
+        </div>
+        {% elif code %}
+        <div class="alert alert-danger text-center">
+            "{{ code }}" kodi bo‘yicha buyurtma topilmadi.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

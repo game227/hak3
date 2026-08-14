@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}B2B Hamkor Paneli — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Top B2B Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="text-white mb-1"><i class="bi bi-building text-warning me-2"></i>B2B Biznes Kabineti</h2>
+            <p class="text-muted small mb-0">Ish joyingiz, real-time bandlik, stollar inventari va tushumlarni boshqaring</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'b2b:checkin' %}" class="btn btn-qs-primary btn-sm">
+                <i class="bi bi-qr-code-scan me-1"></i> Mijozni Check-in qilish
+            </a>
+            <a href="{% url 'b2b:bookings_list' %}" class="btn btn-qs-secondary btn-sm">
+                <i class="bi bi-calendar3 me-1"></i> Barcha buyurtmalar
+            </a>
+            <a href="{% url 'b2b:promotions' %}" class="btn btn-qs-secondary btn-sm">
+                <i class="bi bi-percent me-1"></i> Aksiyalar
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Counters -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3">
+                <div class="text-dim small">Faol buyurtmalar:</div>
+                <div class="fs-3 fw-bold text-emerald-400">{{ active_bookings }} ta</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3">
+                <div class="text-dim small">Bugungi check-inlar:</div>
+                <div class="fs-3 fw-bold text-blue-400">{{ today_checkins }} ta</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3">
+                <div class="text-dim small">Jami daromad (Bookings):</div>
+                <div class="fs-3 fw-bold text-amber-400">{{ total_revenue|floatformat:0 }} so‘m</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3">
+                <div class="text-dim small">Joylar soni:</div>
+                <div class="fs-3 fw-bold text-purple-400">{{ total_locations }} ta</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Locations Live Status Controller -->
+    <div class="qs-card p-4 mb-4">
+        <h5 class="text-white mb-3"><i class="bi bi-broadcast text-emerald-400 me-2"></i>Joylar va Real-Time Live Status</h5>
+        <div class="row g-3">
+            {% for loc in locations %}
+            <div class="col-md-6">
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="text-white mb-0">{{ loc.name }}</h5>
+                        <span class="badge-live-{{ loc.live_status }}">{{ loc.live_badge_text }}</span>
+                    </div>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt me-1"></i>{{ loc.address }}</p>
+
+                    <!-- Live Status Changer Form -->
+                    <form method="POST" action="{% url 'b2b:set_live_status' loc.id %}" class="d-flex gap-2 align-items-center">
+                        {% csrf_token %}
+                        <span class="text-dim text-xs">Holatni o‘zgartirish:</span>
+                        <button type="submit" name="live_status" value="quiet" class="btn btn-sm btn-outline-success px-2 py-1 text-xs {% if loc.live_status == 'quiet' %}active{% endif %}">
+                            🟢 Tinch
+                        </button>
+                        <button type="submit" name="live_status" value="moderate" class="btn btn-sm btn-outline-warning px-2 py-1 text-xs {% if loc.live_status == 'moderate' %}active{% endif %}">
+                            🟡 O‘rtacha
+                        </button>
+                        <button type="submit" name="live_status" value="busy" class="btn btn-sm btn-outline-danger px-2 py-1 text-xs {% if loc.live_status == 'busy' %}active{% endif %}">
+                            🔴 Gavjum
+                        </button>
+                        <a href="{% url 'b2b:inventory' loc.id %}" class="btn btn-sm btn-qs-secondary ms-auto text-xs py-1">
+                            <i class="bi bi-grid me-1"></i> Stollar
+                        </a>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-muted">Sizga biriktirilgan joylar hozircha yo‘q.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="qs-card p-4">
+        <h5 class="text-white mb-3"><i class="bi bi-ticket-perforated text-blue-400 me-2"></i>Oxirgi kelgan buyurtmalar</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead class="bg-slate-900 text-muted small text-uppercase">
+                    <tr>
+                        <th>Kod</th>
+                        <th>Mijoz</th>
+                        <th>Sana / Vaqt</th>
+                        <th>Stol</th>
+                        <th>Summa</th>
+                        <th>Holati</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    {% for b in recent_bookings %}
+                    <tr>
+                        <td class="fw-bold font-monospace text-emerald-400">#{{ b.booking_code }}</td>
+                        <td>{{ b.user.first_name|default:b.user.username }}</td>
+                        <td>{{ b.booking_date|date:"d.m" }} ({{ b.start_time|time:"H:i" }} - {{ b.end_time|time:"H:i" }})</td>
+                        <td>{% if b.table %}Stol #{{ b.table.table_number }}{% else %}Umumiy{% endif %}</td>
+                        <td class="fw-bold text-white">{{ b.total_price|floatformat:0 }} so‘m</td>
+                        <td>
+                            <span class="badge {{ b.status_badge_class }} small">{{ b.get_status_display }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-3 text-muted">Buyurtmalar yo‘q.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

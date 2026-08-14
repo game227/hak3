@@ -1,0 +1,122 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static log %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <section class="xyz-dash-hero" aria-label="Tezkor yo‘riqnoma">
+    <div>
+      <h2 class="xyz-dash-hero__title">QuietSpace Tashkent — Boshqaruv Paneli</h2>
+      <p class="xyz-dash-hero__lead">
+        Toshkent shahridagi barcha tinch ishlash joylari, 3D stollar, to‘lovlar, QuietPass obunalari va sharhlar boshqaruvi.
+        To‘lovlar maxsus paneli:
+        <a href="{% url 'core:admin_payments' %}" style="color:#38bdf8;font-weight:700">/admin-panel/payments/</a>
+      </p>
+    </div>
+    <div class="xyz-quick-grid">
+      <a class="xyz-quick-card" href="{% url 'admin:accounts_user_changelist' %}">
+        <span class="xyz-quick-card__icon">01</span>
+        <span class="xyz-quick-card__label">Foydalanuvchilar</span>
+        <span class="xyz-quick-card__hint">Rollar, ballar, status</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:locations_location_changelist' %}">
+        <span class="xyz-quick-card__icon">02</span>
+        <span class="xyz-quick-card__label">Joylar & Kovorking</span>
+        <span class="xyz-quick-card__hint">Shovqin dB, Wi-Fi, narxlar</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:locations_tabledesk_changelist' %}">
+        <span class="xyz-quick-card__icon">03</span>
+        <span class="xyz-quick-card__label">3D Stollar</span>
+        <span class="xyz-quick-card__hint">Stol raqami, rozetkalar</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:bookings_booking_changelist' %}">
+        <span class="xyz-quick-card__icon">04</span>
+        <span class="xyz-quick-card__label">Buyurtmalar</span>
+        <span class="xyz-quick-card__hint">Bronlar va check-in</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:payments_subscriptionrequest_changelist' %}">
+        <span class="xyz-quick-card__icon">05</span>
+        <span class="xyz-quick-card__label">QuietPass So‘rovlari</span>
+        <span class="xyz-quick-card__hint">Cheklar, qabul / bekor qilish</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:payments_payment_changelist' %}">
+        <span class="xyz-quick-card__icon">06</span>
+        <span class="xyz-quick-card__label">Barcha To‘lovlar</span>
+        <span class="xyz-quick-card__hint">Tranzaksiyalar tarixi</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:payments_quietpass_changelist' %}">
+        <span class="xyz-quick-card__icon">07</span>
+        <span class="xyz-quick-card__label">Faol Obunalar</span>
+        <span class="xyz-quick-card__hint">QuietPass muddatlari</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:measurements_internettest_changelist' %}">
+        <span class="xyz-quick-card__icon">08</span>
+        <span class="xyz-quick-card__label">Speedtest O‘lchovlari</span>
+        <span class="xyz-quick-card__hint">Internet tezligi tekshiruvlari</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:reviews_review_changelist' %}">
+        <span class="xyz-quick-card__icon">09</span>
+        <span class="xyz-quick-card__label">Sharhlar</span>
+        <span class="xyz-quick-card__hint">Moderatsiya va baholar</span>
+      </a>
+      <a class="xyz-quick-card" href="{% url 'admin:payments_contactchannel_changelist' %}">
+        <span class="xyz-quick-card__icon">10</span>
+        <span class="xyz-quick-card__label">Kontaktlar</span>
+        <span class="xyz-quick-card__hint">Telegram, telefon, email</span>
+      </a>
+    </div>
+  </section>
+
+  <aside class="xyz-help-panel">
+    <h2>QuietSpace Administrator yo‘riqnomasi</h2>
+    <ol>
+      <li><strong>Yangi Joy qo‘shish:</strong> «Joylar & Kovorking» bo‘limiga kirib, manzil, shovqin (dB), internet tezligi va zonalarni belgilang.</li>
+      <li><strong>3D Stollar yaratish:</strong> Har bir zona ichiga stollar qo‘shing (rozetka bor/yo‘q, stol turi).</li>
+      <li><strong>QuietPass To‘lovlarini tasdiqlash:</strong> «QuietPass So‘rovlari»ga kirib, yuborilgan chekni ko‘rib <em>ACCEPT</em> tugmasini bosing.</li>
+      <li><strong>Sharhlar moderatsiyasi:</strong> Foydalanuvchilar qoldirgan sharhlarni tasdiqlang.</li>
+    </ol>
+  </aside>
+
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+  <div class="module" id="recent-actions-module">
+    <h2>So‘nggi amallar</h2>
+    <h3>Sizning ishlaringiz</h3>
+    {% get_admin_log 12 as admin_log for_user user %}
+    {% if not admin_log %}
+      <p>Hali amallar yo‘q.</p>
+    {% else %}
+      <ul class="actionlist">
+        {% for entry in admin_log %}
+          <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+            {% if entry.is_deletion or not entry.get_admin_url %}
+              {{ entry.object_repr }}
+            {% else %}
+              <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+            {% endif %}
+            <br>
+            {% if entry.content_type %}
+              <span class="mini quiet">{{ entry.content_type.name|capfirst }}</span>
+            {% else %}
+              <span class="mini quiet">Noma’lum</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

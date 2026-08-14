@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Jonli dars — {{ SITE_NAME }}{% endblock %}
+{% block extra_css %}
+<link href="{% static 'css/live.css' %}?v=4" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="container py-4 live-page mx-auto">
+    <div class="mb-3 text-center">
+        <p class="section-kicker mb-1">Jonli dars</p>
+        {% if user.can_manage_content %}
+        <a href="{% url 'live:host' %}" class="btn btn-ghost btn-sm">Efir boshqaruvi</a>
+        {% endif %}
+    </div>
+
+    <div class="panel live-card">
+        {% if session and session.status == 'LIVE' %}
+            <div class="live-card__icon is-live">
+                <i class="bi {% if session.platform == 'TELEGRAM' %}bi-telegram{% else %}bi-youtube{% endif %}"></i>
+            </div>
+            <div class="mb-2"><span class="live-badge">JONLI</span></div>
+            <h1 class="live-card__title">{{ session.title }}</h1>
+            <p class="live-card__meta">
+                O‘qituvchi: <strong>{{ session.host.get_full_name|default:session.host.username }}</strong>
+                <br>
+                <span class="live-card__platform {% if session.platform == 'TELEGRAM' %}is-telegram{% else %}is-youtube{% endif %}">
+                    <i class="bi {% if session.platform == 'TELEGRAM' %}bi-telegram{% else %}bi-youtube{% endif %}"></i>
+                    {{ session.get_platform_display }}da efirda
+                </span>
+            </p>
+            <a href="{{ session.stream_url }}" target="_blank" rel="noopener" class="btn-go">
+                Efirga o‘tish <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        {% elif session %}
+            <div class="live-card__icon is-idle"><i class="bi bi-clock-history"></i></div>
+            <h1 class="live-card__title">Efir hozircha yopiq</h1>
+            <p class="live-card__meta">
+                Oxirgi dars: <strong>{{ session.title }}</strong> — yakunlangan.<br>
+                Keyingi jonli darsni kuting, boshlanganda sizga bildirishnoma yuboriladi.
+            </p>
+        {% else %}
+            <div class="live-card__icon is-idle"><i class="bi bi-broadcast"></i></div>
+            <h1 class="live-card__title">Hozircha jonli dars yo‘q</h1>
+            <p class="live-card__meta">O‘qituvchi jonli darsni boshlaganda shu sahifada havola paydo bo‘ladi va sizga bildirishnoma yuboriladi.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

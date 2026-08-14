@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav class="crumb mb-3">
+        <a href="{% url 'education:subject_list' %}">Darslar</a>
+        <span>/</span>
+        <a href="{% url 'education:subject_detail' lesson.topic.module.course.subject.pk %}">{{ lesson.topic.module.course.subject.name }}</a>
+        <span>/</span>
+        <a href="{% url 'education:course_detail' lesson.topic.module.course.pk %}">{{ lesson.topic.module.course.title }}</a>
+        <span>/</span>
+        <a href="{% url 'education:module_detail' lesson.topic.module.pk %}">{{ lesson.topic.module.title }}</a>
+        <span>/</span>
+        <a href="{% url 'education:topic_detail' lesson.topic.pk %}">{{ lesson.topic.title }}</a>
+        <span>/</span>
+        <span>{{ lesson.title }}</span>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <h1 class="h4 fw-bold mb-0">{{ lesson.title }}</h1>
+        {% if is_free %}<span class="free-badge">Bepul dars</span>{% endif %}
+    </div>
+
+    <div class="video-frame mb-2">
+        <video id="lesson-video" controls preload="metadata" src="{{ lesson.video.url }}"
+               data-watch-url="{% url 'progress:save_watch_progress' lesson.pk %}"
+               data-csrf="{{ csrf_token }}"
+               data-min="{{ min_watch_percent }}"></video>
+    </div>
+    <div class="watch-bar mb-3" aria-hidden="true">
+        <span id="watch-bar-fill" style="width: {{ watch_percent }}%"></span>
+    </div>
+    <p class="small text-muted mb-3" id="watch-hint">
+        Tomosha: <strong id="watch-pct">{{ watch_percent }}</strong>% —
+        «Tugatildi» uchun kamida {{ min_watch_percent }}% kerak.
+    </p>
+
+    <p class="text-muted">{{ lesson.description }}</p>
+
+    {% if lesson.pdf_material %}
+        <a href="{{ lesson.pdf_material.url }}" class="btn btn-ghost btn-sm mb-3" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Qo‘shimcha material (PDF)
+        </a>
+    {% endif %}
+
+    <div class="panel mb-3">
+        <strong>Shu video testi:</strong> 10 ta savol
+        {% if best_attempt %}
+            <span class="text-muted small ms-2">Eng yaxshi: {{ best_attempt.score }}%</span>
+        {% endif %}
+        {% if can_start_test %}
+            <div class="mt-2">
+                <a href="{% url 'exam:exam_start' lesson.pk %}" class="btn btn-primary btn-sm">Testni boshlash</a>
+                <a href="{% url 'exam:exam_history' lesson.pk %}" class="btn btn-ghost btn-sm">Tarix</a>
+            </div>
+        {% else %}
+            <p class="text-muted small mb-0 mt-2">Testni ochish uchun avval videoni {{ min_watch_percent }}%+ tomosha qilib «Tugatildi» bosing.</p>
+        {% endif %}
+    </div>
+
+    {% if lesson_teacher %}
+    <div class="panel mb-3">
+        <h2 class="h6 fw-bold mb-2">O‘qituvchini baholang</h2>
+        <p class="text-muted small mb-2">
+            {{ lesson_teacher.get_full_name|default:lesson_teacher.username }} —
+            1 dan 5 yulduzgacha.
+            {% if my_teacher_rating %}(Sizning baho: {{ my_teacher_rating.stars }}★){% endif %}
+        </p>
+        <form method="post" action="{% url 'core:rate_teacher' lesson_teacher.pk %}" class="d-flex flex-wrap gap-2 align-items-center">
+            {% csrf_token %}
+            <input type="hidden" name="lesson_id" value="{{ lesson.pk }}">
+            <select name="stars" class="form-select form-select-sm u-w-auto" required>
+                <option value="">Yulduz</option>
+                {% for i in "12345" %}
+                <option value="{{ i }}" {% if my_teacher_rating and my_teacher_rating.stars == forloop.counter %}selected{% endif %}>{{ i }} ★</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="comment" class="form-control form-control-sm u-max-240" maxlength="300" placeholder="Izoh (ixtiyoriy)" value="{{ my_teacher_rating.comment|default:'' }}">
+            <button type="submit" class="btn btn-primary btn-sm">Saqlash</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3 gap-2 flex-wrap">
+        <form method="post" action="{% url 'progress:mark_lesson_complete' lesson.pk %}">
+            {% csrf_token %}
+            {% if is_completed %}
+                <button class="btn btn-primary" disabled><i class="bi bi-check-circle-fill"></i> Tugatilgan</button>
+            {% else %}
+                <button type="submit" class="btn btn-outline-primary" id="complete-btn"
+                        {% if not can_mark_complete %}disabled{% endif %}>
+                    Tugatildi deb belgilash
+                </button>
+            {% endif %}
+        </form>
+
+        {% if next_lesson %}
+            <a href="{% url 'education:lesson_detail' next_lesson.pk %}" class="btn btn-primary">
+                Keyingi dars <i class="bi bi-arrow-right"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'education:topic_detail' lesson.topic.pk %}" class="btn btn-ghost">Mavzuga qaytish</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const video = document.getElementById('lesson-video');
+  const fill = document.getElementById('watch-bar-fill');
+  const pctEl = document.getElementById('watch-pct');
+  const btn = document.getElementById('complete-btn');
+  if (!video) return;
+  const url = video.dataset.watchUrl;
+  const csrf = video.dataset.csrf;
+  const min = parseInt(video.dataset.min || '70', 10);
+  let lastSent = parseInt(pctEl?.textContent || '0', 10) || 0;
+
+  function send(percent) {
+    if (percent <= lastSent) return;
+    lastSent = percent;
+    const body = new URLSearchParams();
+    body.set('percent', String(percent));
+    body.set('csrfmiddlewaretoken', csrf);
+    fetch(url, { method: 'POST', headers: { 'X-CSRFToken': csrf }, body, credentials: 'same-origin' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.ok) return;
+        if (fill) fill.style.width = data.watch_percent + '%';
+        if (pctEl) pctEl.textContent = data.watch_percent;
+        if (btn && data.can_complete) btn.disabled = false;
+      })
+      .catch(() => {});
+  }
+
+  video.addEventListener('timeupdate', () => {
+    if (!video.duration || !isFinite(video.duration)) return;
+    const percent = Math.min(100, Math.floor((video.currentTime / video.duration) * 100));
+    if (fill) fill.style.width = Math.max(lastSent, percent) + '%';
+    if (pctEl) pctEl.textContent = Math.max(lastSent, percent);
+    if (percent >= lastSent + 5 || percent >= min) send(percent);
+    if (percent >= 95) send(100);
+  });
+  video.addEventListener('ended', () => send(100));
+})();
+</script>
+{% endblock %}

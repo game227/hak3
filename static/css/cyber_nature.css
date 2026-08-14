@@ -1,0 +1,595 @@
+/* ==========================================================================
+   QuietSpace Tashkent — Peaceful Cyber-Nature Design System (Polished Edition)
+   Enhanced Typography, High Contrast Text Colors, Soft Battery-Friendly Animations
+   ========================================================================== */
+
+:root {
+    --bg-primary: #0b131f;
+    --bg-secondary: #070c14;
+    --bg-surface: rgba(255, 255, 255, 0.04);
+    --bg-surface-hover: rgba(255, 255, 255, 0.07);
+    --bg-glass-card: rgba(15, 23, 38, 0.78);
+
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --border-glass-hover: rgba(16, 185, 129, 0.35);
+    --border-glow-cyan: rgba(56, 189, 248, 0.4);
+
+    /* ── High Contrast Typography Colors ── */
+    --text-pure: #ffffff;
+    --text-main: #f8fafc;
+    --text-secondary: #cbd5e1;  /* High readability light slate */
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+
+    /* ── Zen & Cyber Accents ── */
+    --accent-emerald: #10b981;
+    --accent-emerald-light: #34d399;
+    --accent-cyan: #38bdf8;
+    --accent-cyan-light: #7dd3fc;
+    --accent-purple: #c084fc;
+    --accent-amber: #fbbf24;
+    --accent-rose: #f43f5e;
+
+    --glow-emerald: 0 0 20px rgba(16, 185, 129, 0.25);
+    --glow-cyan: 0 0 20px rgba(56, 189, 248, 0.25);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+}
+
+/* ── Fullscreen Interactive Nature Background Canvas ── */
+#nature-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform;
+}
+
+body {
+    background-color: var(--bg-primary);
+    background-image: 
+        radial-gradient(circle at 10% 15%, rgba(16, 185, 129, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 90% 60%, rgba(56, 189, 248, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 95%, rgba(192, 132, 252, 0.04) 0%, transparent 50%);
+    color: var(--text-secondary);
+    font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--text-pure);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+}
+
+p, span, li, td {
+    color: var(--text-secondary);
+}
+
+.text-white {
+    color: var(--text-pure) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-dim {
+    color: #94a3b8 !important;
+}
+
+/* ── Glassmorphism Surface & Cards (Lightweight Blur) ── */
+.zen-glass-card {
+    background: var(--bg-glass-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.45);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    will-change: transform;
+}
+
+.zen-glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+.zen-glass-card:hover {
+    border-color: var(--border-glass-hover);
+    box-shadow: 0 14px 36px -8px rgba(0, 0, 0, 0.55), var(--glow-emerald);
+}
+
+/* Soft 3D Tilt Wrapper */
+.tilt-card-wrap {
+    perspective: 800px;
+    transform-style: preserve-3d;
+}
+
+.tilt-card-wrap:hover .zen-glass-card {
+    transform: translateY(-4px);
+}
+
+/* Subtle Glowing Leaf Overlay */
+.leaf-overlay {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    width: 80px;
+    height: 80px;
+    opacity: 0.03;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.zen-glass-card:hover .leaf-overlay {
+    opacity: 0.1;
+}
+
+/* ── AI Smart Search Glass Input ── */
+.ai-glass-searchbox {
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: var(--radius-xl);
+    padding: 6px 10px 6px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    transition: all 0.25s ease;
+}
+
+.ai-glass-searchbox:focus-within {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), var(--glow-cyan);
+}
+
+.ai-glass-searchbox input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-pure);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.ai-glass-searchbox input::placeholder {
+    color: #94a3b8;
+}
+
+/* ── Live Status Pulse Indicator Dots ── */
+.status-pulse-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+}
+
+.status-pulse-dot.quiet {
+    background-color: var(--accent-emerald-light);
+    box-shadow: 0 0 8px var(--accent-emerald);
+}
+
+.status-pulse-dot.moderate {
+    background-color: var(--accent-amber);
+    box-shadow: 0 0 8px var(--accent-amber);
+}
+
+.status-pulse-dot.busy {
+    background-color: var(--accent-rose);
+    box-shadow: 0 0 8px var(--accent-rose);
+}
+
+/* Live Badges */
+.badge-live-quiet {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge-live-moderate {
+    background: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    color: #fbbf24;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge-live-busy {
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    color: #f43f5e;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ── Live Soundwave Analyzer Bars (Noise dB Meter) ── */
+.soundwave-meter {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2.5px;
+    height: 16px;
+    padding: 0 2px;
+}
+
+.soundwave-meter .bar {
+    width: 2.5px;
+    background: linear-gradient(to top, var(--accent-emerald), var(--accent-cyan));
+    border-radius: 2px;
+    animation: soundwaveBounce 1.5s infinite ease-in-out alternate;
+}
+
+.soundwave-meter .bar:nth-child(1) { height: 35%; animation-delay: 0.1s; }
+.soundwave-meter .bar:nth-child(2) { height: 75%; animation-delay: 0.3s; }
+.soundwave-meter .bar:nth-child(3) { height: 100%; animation-delay: 0.15s; }
+.soundwave-meter .bar:nth-child(4) { height: 50%; animation-delay: 0.4s; }
+
+@keyframes soundwaveBounce {
+    0% { transform: scaleY(0.4); opacity: 0.6; }
+    100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* ── SVG Speed Gauge Meter ── */
+.speed-gauge-wrap {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.speed-gauge-wrap svg {
+    transform: rotate(-90deg);
+}
+
+.speed-gauge-wrap .gauge-bg {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+.speed-gauge-wrap .gauge-val {
+    stroke: var(--accent-cyan);
+    stroke-dasharray: 100;
+    stroke-dashoffset: 20;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+/* ── 3D Seat Grid Layout (Softened Transform) ── */
+.zen-3d-seat-stage {
+    perspective: 800px;
+    padding: 24px 10px;
+    overflow: hidden;
+}
+
+.zen-3d-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    gap: 16px;
+    transform: rotateX(12deg);
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.zen-seat-pod {
+    background: rgba(18, 28, 48, 0.85);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transform: translateZ(0);
+}
+
+.zen-seat-pod:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.zen-seat-pod.selected {
+    transform: translateY(-8px) scale(1.05) !important;
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--accent-emerald) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), var(--glow-emerald) !important;
+}
+
+.zen-seat-pod.occupied {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(10, 15, 25, 0.6);
+}
+
+/* ── Gamification Eco-Growth UI ── */
+.zen-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.tier-explorer {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--accent-emerald-light);
+}
+
+.tier-master {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--accent-cyan-light);
+}
+
+.tier-guru {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(251, 191, 36, 0.2) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #fde047;
+}
+
+/* Soft 3D Rotating Medallion */
+.medallion-3d {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.6rem;
+    box-shadow: var(--glow-emerald);
+}
+
+.zen-progress-bar {
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.zen-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-emerald) 0%, var(--accent-cyan) 100%);
+    border-radius: var(--radius-full);
+}
+
+/* ── Floating Ambient Nature Audio Widget & Soundboard Modal ── */
+.ambient-audio-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 999;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: var(--radius-full);
+    padding: 8px 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.ambient-audio-widget:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), var(--glow-cyan);
+}
+
+.ambient-audio-widget.playing {
+    border-color: var(--accent-emerald);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), var(--glow-emerald);
+}
+
+/* Equalizer Bars in Audio Widget */
+.zen-eq-wrap {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+}
+
+.zen-eq-wrap .eq-bar {
+    width: 2px;
+    background: var(--accent-emerald-light);
+    border-radius: 1px;
+    animation: eqBounce 0.8s infinite ease-in-out alternate;
+}
+
+.zen-eq-wrap .eq-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+.zen-eq-wrap .eq-bar:nth-child(2) { height: 90%; animation-delay: 0.3s; }
+.zen-eq-wrap .eq-bar:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+.zen-eq-wrap .eq-bar:nth-child(4) { height: 100%; animation-delay: 0.4s; }
+
+@keyframes eqBounce {
+    0% { height: 25%; }
+    100% { height: 100%; }
+}
+
+/* ── Zen Soundboard Modal / Drawer ── */
+.zen-soundboard-modal {
+    position: fixed;
+    bottom: 75px;
+    left: 20px;
+    width: 340px;
+    max-width: 90vw;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border-glass-hover);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), var(--glow-cyan);
+    padding: 16px;
+    z-index: 1000;
+    display: none;
+    animation: fadeInSlideUp 0.25s ease-out;
+}
+
+.zen-soundboard-modal.show {
+    display: block;
+}
+
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.zen-sound-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-main);
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.zen-sound-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-cyan);
+    transform: translateY(-1px);
+}
+
+.zen-sound-card.active {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: var(--accent-emerald);
+    color: var(--accent-emerald-light);
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+/* ── Fluid Liquid Wave Animation ── */
+.liquid-wave-box {
+    position: relative;
+    width: 100%;
+    height: 70px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: rgba(16, 185, 129, 0.06);
+}
+
+.liquid-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.2) 0%, rgba(56, 189, 248, 0.1) 100%);
+    animation: waveScroll 5s linear infinite;
+}
+
+@keyframes waveScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* ── Refined Luxury Buttons ── */
+.btn-zen-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 9px 20px;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.btn-zen-primary:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+    transform: translateY(-2px);
+}
+
+.btn-zen-cyan {
+    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+    color: #ffffff !important;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 9px 20px;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.btn-zen-cyan:hover {
+    background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
+    transform: translateY(-2px);
+}
+
+.btn-zen-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-glass);
+    color: #f8fafc !important;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    padding: 9px 20px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.btn-zen-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}

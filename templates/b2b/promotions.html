@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Aksiyalar va Chegirmalar — B2B Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-white mb-1"><i class="bi bi-percent text-amber-400 me-2"></i>Aksiyalar va Maxsus Takliflar</h2>
+            <p class="text-muted small mb-0">Bo‘sh soatlarni to‘ldirish uchun chegirma va aksiyalar e’lon qiling</p>
+        </div>
+        <a href="{% url 'b2b:dashboard' %}" class="btn btn-qs-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> B2B Kabinet
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Create Promotion Form -->
+        <div class="col-lg-5">
+            <div class="qs-card p-4">
+                <h5 class="text-white mb-3"><i class="bi bi-plus-circle text-emerald-400 me-2"></i>Yangi Aksiya Yaratish</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small">Qaysi joy uchun:</label>
+                        <select name="location_id" class="form-select form-select-sm" required>
+                            {% for loc in locations %}
+                            <option value="{{ loc.id }}">{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Aksiya sarlavhasi:</label>
+                        <input type="text" name="title" class="form-control form-control-sm" placeholder="Ertalabki 20% chegirma" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Chegirma foizi (%):</label>
+                        <input type="number" name="discount_percent" value="15" min="5" max="90" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small">Boshlanish:</label>
+                            <input type="date" name="start_date" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Tugash:</label>
+                            <input type="date" name="end_date" class="form-control form-control-sm" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Batafsil shartlar:</label>
+                        <textarea name="description" rows="3" class="form-control form-control-sm" placeholder="Shartlar va izoh..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-qs-primary btn-sm w-100">Aksiyani e’lon qilish</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Promotions List -->
+        <div class="col-lg-7">
+            <div class="qs-card p-4">
+                <h5 class="text-white mb-3">Mavjud Aksiyalar</h5>
+                <div class="d-flex flex-column gap-3">
+                    {% for promo in promotions %}
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="text-white fw-bold mb-1">{{ promo.title }}</h6>
+                                <span class="text-dim text-xs">{{ promo.location.name }}</span>
+                            </div>
+                            <span class="badge bg-amber-950 text-amber-300 border border-amber-800 fs-6">
+                                -{{ promo.discount_percent }}%
+                            </span>
+                        </div>
+                        <p class="text-slate-300 small mb-2">{{ promo.description }}</p>
+                        <div class="text-dim text-xs">Amal qilish muddati: {{ promo.start_date|date:"d.m.Y" }} — {{ promo.end_date|date:"d.m.Y" }}</div>
+                    </div>
+                    {% empty %}
+                    <div class="text-muted small">Hozircha aksiyalar yaratilmagan.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

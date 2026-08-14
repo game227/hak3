@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: quietspace_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: quietspace_db
+      POSTGRES_USER: quietspace_user
+      POSTGRES_PASSWORD: quietspace_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: quietspace_web
+    restart: always
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=quietspace-production-docker-secret-key-2026
+      - ALLOWED_HOSTS=*
+      - DATABASE_URL=postgresql://quietspace_user:quietspace_password@db:5432/quietspace_db
+      - TIME_ZONE=Asia/Tashkent
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

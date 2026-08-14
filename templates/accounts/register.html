@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks %}
+
+{% block title %}Ro‘yxatdan O‘tish — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-5 max-w-lg mx-auto">
+    <div class="qs-card p-4 p-md-5">
+        <div class="text-center mb-4">
+            <div class="logo-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                <i class="bi bi-soundwave"></i>
+            </div>
+            <h3 class="text-white fw-bold">Ro‘yxatdan O‘tish</h3>
+            <p class="text-muted small">Toshkentdagi tinch ishlash joylari ekotizimiga qo‘shiling</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label small text-slate-300">Ism:</label>
+                    {% render_field form.first_name class="form-control form-control-sm" placeholder="Ismingiz" %}
+                </div>
+                <div class="col-6">
+                    <label class="form-label small text-slate-300">Familiya:</label>
+                    {% render_field form.last_name class="form-control form-control-sm" placeholder="Familiyangiz" %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-slate-300">Foydalanuvchi nomi (Username):</label>
+                {% render_field form.username class="form-control form-control-sm" placeholder="Masalan: jasur_dev" %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-slate-300">Email:</label>
+                {% render_field form.email class="form-control form-control-sm" placeholder="example@mail.com" %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-slate-300">Telefon raqami:</label>
+                {% render_field form.phone_number class="form-control form-control-sm" placeholder="+998 90 123 45 67" %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-slate-300">Foydalanish maqsadi:</label>
+                {% render_field form.role class="form-select form-select-sm" %}
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <label class="form-label small text-slate-300">Parol:</label>
+                    {% render_field form.password1 class="form-control form-control-sm" placeholder="Kamida 6 belgi" %}
+                </div>
+                <div class="col-6">
+                    <label class="form-label small text-slate-300">Parolni takrorlang:</label>
+                    {% render_field form.password2 class="form-control form-control-sm" placeholder="Parolni tasdiqlang" %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-qs-primary btn-lg w-100 justify-content-center py-2 mb-3">
+                Hisob yaratish
+            </button>
+
+            <div class="text-center text-muted small">
+                Allaqachon hisobingiz bormi? <a href="{% url 'accounts:login' %}" class="text-emerald-400 text-decoration-none fw-bold">Kirish</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

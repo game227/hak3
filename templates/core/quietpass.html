@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}QuietPass Obunasi — Toshkentdagi barcha hamkor joylarga yagona chipta{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center max-w-2xl mx-auto mb-5">
+        <span class="badge bg-purple-950 text-purple-300 border border-purple-800 px-3 py-2 rounded-pill mb-3">
+            <i class="bi bi-shield-check me-1"></i> Yagona Onlayn Obuna Tizimi
+        </span>
+        <h1 class="display-5 fw-extrabold text-white mb-3">
+            Barcha tinch joylarga <br><span class="text-purple-400">bitta QuietPass</span> bilan kiring
+        </h1>
+        <p class="lead text-muted small fs-6">
+            Onlayn to‘lov va admin tekshiruvi orqali tarifni tanlab so‘rov yuboring — administrator to‘lovni tasdiqlagach obunangiz faollashadi.
+        </p>
+    </div>
+
+    <!-- Active User Pass Card (if user has active pass) -->
+    {% if user_pass and user_pass.is_currently_active %}
+    <div class="qs-card mb-5 p-4" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); border-color: rgba(168, 85, 247, 0.4);">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge bg-emerald-500 text-white px-3 py-1 rounded-pill mb-2">🟢 Faol Obuna</span>
+                <h3 class="text-white mb-1">{{ user_pass.plan_name }}</h3>
+                <p class="text-slate-300 small mb-0">Amal qilish muddati: <strong>{{ user_pass.end_date|date:"d.m.Y" }} gacha</strong></p>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge bg-slate-900 text-white border border-slate-700 p-2 d-flex align-items-center gap-2">
+                    <i class="bi bi-cup-hot-fill text-amber-400"></i> Kunlik kofe huquqi mavjud
+                </span>
+                <span class="badge bg-slate-900 text-white border border-slate-700 p-2 d-flex align-items-center gap-2">
+                    <i class="bi bi-percent text-emerald-400"></i> -{{ user_pass.plan.discount_percent|default:20 }}% chegirma
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pricing Comparison Cards -->
+    <div class="row g-4 justify-content-center mb-5">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="qs-card h-100 p-4 d-flex flex-column justify-content-between position-relative {% if plan.is_popular or plan.plan_code == 'monthly' %}border-purple-500 shadow-lg{% endif %}" style="{% if plan.is_popular or plan.plan_code == 'monthly' %}background: rgba(24, 18, 40, 0.9);{% endif %}">
+                {% if plan.is_popular or plan.plan_code == 'monthly' %}
+                <div class="position-absolute top-0 end-0 bg-purple-600 text-white text-xs fw-bold px-3 py-1 rounded-bottom-start">
+                    Tavsiya etiladi
+                </div>
+                {% endif %}
+
+                <div>
+                    <h4 class="text-white mb-1">{{ plan.name }}</h4>
+                    <p class="text-muted small mb-3">{{ plan.duration_days }} kunlik to‘liq erkinlik</p>
+
+                    <div class="my-3 pb-3 border-bottom border-slate-800">
+                        <div class="display-6 fw-extrabold text-white">
+                            {{ plan.price|floatformat:0 }} <small class="fs-6 text-muted">so‘m</small>
+                        </div>
+                    </div>
+
+                    <!-- Perks List -->
+                    <ul class="list-unstyled small text-slate-300 mb-4">
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-emerald-400 fs-5"></i>
+                            <span>Barcha hamkor joylarda <strong>-{{ plan.discount_percent }}% chegirma</strong></span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-emerald-400 fs-5"></i>
+                            <span>Kuniga <strong>1 ta bepul kofe / choy</strong></span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-emerald-400 fs-5"></i>
+                            <span>Zoom kabinalariga ustuvor kirish</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle text-emerald-400 fs-5"></i>
+                            <span>AI tavsiyalar va eslatmalar</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <a href="#obuna-sorov" class="btn {% if plan.is_popular or plan.plan_code == 'monthly' %}btn-qs-primary{% else %}btn-qs-secondary{% endif %} w-100 justify-content-center py-2" data-plan-id="{{ plan.id }}">
+                    Shu tarifni so‘rash
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Request Form & Admin Contacts Row -->
+    <div class="row g-4 mb-5">
+        <!-- Request Form -->
+        <div class="col-lg-7">
+            <div class="qs-card p-4 h-100" id="obuna-sorov">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="metric-icon-wrap" style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                        <i class="bi bi-send-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white mb-0">Obuna so‘rash</h4>
+                        <span class="text-muted small">Formani to‘ldiring — so‘rovingiz to‘g‘ridan-to‘g‘ri administratorga tushadi.</span>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="mt-4">
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-slate-300 small">To‘liq ismingiz:</label>
+                            <input type="text" name="full_name" class="form-control form-control-sm" value="{% if user.is_authenticated %}{{ user.first_name }} {{ user.last_name }}{% endif %}" placeholder="Ism Familiya" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-slate-300 small">Telefon raqami:</label>
+                            <input type="text" name="phone" class="form-control form-control-sm" value="{% if user.is_authenticated %}{{ user.phone_number }}{% endif %}" placeholder="+998 90 123 45 67" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-slate-300 small">Telegram username (ixtiyoriy):</label>
+                            <input type="text" name="telegram" class="form-control form-control-sm" value="{% if user.is_authenticated %}{{ user.telegram_username }}{% endif %}" placeholder="@username">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-slate-300 small">Tarif rejasi:</label>
+                            <select name="plan_id" id="id_plan_id" class="form-select form-select-sm" required>
+                                {% for plan in plans %}
+                                <option value="{{ plan.id }}" {% if plan.is_popular %}selected{% endif %}>{{ plan.name }} — {{ plan.price_label }} ({{ plan.duration_days }} kun)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-slate-300 small">To‘lov cheki / Skrinshot (ixtiyoriy):</label>
+                        <input type="file" name="receipt_image" class="form-control form-control-sm" accept="image/*">
+                        <div class="text-dim text-xs mt-1">Karta orqali to‘lov qilgan bo‘lsangiz, chekini biriktirishingiz mumkin.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-slate-300 small">Izoh yoki qo‘shimcha savol:</label>
+                        <textarea name="note" rows="3" class="form-control form-control-sm" placeholder="Masalan: Tezkor tasdiqlashingizni so‘rayman yoki savollar..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-qs-primary btn-lg w-100 justify-content-center py-2">
+                        <i class="bi bi-send me-1"></i> So‘rov yuborish
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Administrator bilan bog‘lanish -->
+        <div class="col-lg-5">
+            <div class="qs-card p-4 h-100 d-flex flex-column justify-content-between" style="background: rgba(18, 24, 38, 0.95);">
+                <div>
+                    <h5 class="text-white mb-2"><i class="bi bi-headset text-purple-400 me-2"></i>Administrator bilan bog‘lanish</h5>
+                    <p class="text-muted small mb-4">So‘rov yuborishdan tashqari, to‘lov va savollar bo‘yicha to‘g‘ridan-to‘g‘ri administratorga murojaat qilishingiz mumkin.</p>
+
+                    <div class="d-flex flex-column gap-3">
+                        {% for c in contacts %}
+                        <a href="{{ c.href }}" target="_blank" class="p-3 bg-slate-900 border border-slate-800 rounded-3 text-decoration-none d-flex align-items-center justify-content-between hover-border-emerald transition-all">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="metric-icon-wrap" style="width: 42px; height: 42px; background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+                                    <i class="bi {{ c.icon }} fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-white small">{{ c.label }}</div>
+                                    <div class="text-muted text-xs">{{ c.value }}</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-box-arrow-up-right text-slate-500 small"></i>
+                        </a>
+                        {% empty %}
+                        <div class="p-3 bg-slate-900 border border-slate-800 rounded-3 text-center text-muted small">
+                            <i class="bi bi-telegram text-info fs-4 d-block mb-1"></i>
+                            Telegram: <strong>@QuietSpaceSupport</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="p-3 bg-slate-950 border border-slate-800 rounded-3 mt-4">
+                    <div class="text-dim text-xs">
+                        <i class="bi bi-info-circle text-emerald-400 me-1"></i>
+                        So‘rovingiz yuborilgach, administrator admin panelda to‘lov ma’lumotlarini tekshiradi va tasdiqlagach, QuietPass obunangiz avtomatik tarzda <strong>ACTIVE</strong> holatiga o‘tadi.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive FAQ & Knowledge Base Section -->
+    <div class="max-w-3xl mx-auto pt-5 mt-4 border-top border-slate-800">
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded-pill mb-2">
+                <i class="bi bi-question-circle-fill text-emerald-400"></i>
+                <span class="text-white text-xs fw-bold">FAQ & Qo‘llanma</span>
+            </div>
+            <h3 class="text-white fw-bold mb-2">Ko‘p beriladigan savollar</h3>
+            <p class="text-muted small">QuietPass, to‘lovlar, 3D stollar va kafolatlar haqidagi barcha javoblar</p>
+        </div>
+
+        <!-- FAQ Search Box -->
+        <div class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text bg-slate-900 border-slate-700 text-slate-400">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="faq-search-input" class="form-control bg-slate-900 border-slate-700 text-white" placeholder="Savollarni qidirish (masalan: to‘lov, qahva, bekor qilish, 3D stol)..." onkeyup="filterFaqQuestions()">
+            </div>
+        </div>
+
+        <!-- FAQ Accordion -->
+        <div class="accordion d-flex flex-column gap-3" id="qpAccordion">
+            <!-- Item 1 -->
+            <div class="faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="quietpass chegirma qahva obuna nima">
+                <h2 class="accordion-header">
+                    <button class="accordion-button bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1">
+                        <span class="text-emerald-400">💳</span> QuietPass nima va u menga qanday foyda beradi?
+                    </button>
+                </h2>
+                <div id="faq-1" class="accordion-collapse collapse show" data-bs-parent="#qpAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        <strong>QuietPass</strong> — bu Toshkentdagi barcha hamkor kovorkinglar, kutubxonalar va sokin kafelarga yagona obuna orqali kirish imkoniyati. 
+                        Obunachilar <strong>10% dan 25% gacha chegirma</strong>, bepul premium qahvalar va eng sokin 3D stollarni oldindan kafolatli band qilish imkoniyatiga ega bo‘ladilar.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="tolov to'lov tasdiqlash pending qancha vaqt admin click payme uzum">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2">
+                        <span class="text-cyan-400">⚡️</span> To‘lov qanday tasdiqlanadi va qancha vaqt oladi?
+                    </button>
+                </h2>
+                <div id="faq-2" class="accordion-collapse collapse" data-bs-parent="#qpAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        So‘rov yuborganingizda tizimda to‘lov holati <strong>PENDING</strong> (kutilmoqda) holatida paydo bo‘ladi. Administrator chekni yoki to‘lovni tekshirib <strong>ACCEPT</strong> qilishi bilanoq (~2–5 daqiqa) obunangiz faollashadi va sizga sayt hamda Telegram orqali bildirishnoma keladi.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="qahva bepul kofe ichimlik olish qayerda">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3">
+                        <span class="text-amber-400">☕️</span> Hamkor joylarda bepul qahvani qanday olaman?
+                    </button>
+                </h2>
+                <div id="faq-3" class="accordion-collapse collapse" data-bs-parent="#qpAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Hamkor kafega borganda Telegram botimizdagi (<a href="https://t.me/QuietSpace_Tashkent_bot" target="_blank" class="text-emerald-400">@QuietSpace_Tashkent_bot</a>) yoki saytdagi profilingizda turgan <strong>QuietPass QR-kodini</strong> baristaga ko‘rsatasiz. Tizim avtomatik sizga tegishli bepul qahvani yozib beradi.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="bekor qilish qaytarish pul refund obunani toxtatish">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#faq-4">
+                        <span class="text-rose-400">🛡</span> Obunani bekor qilish yoki pulni qaytarish mumkinmi?
+                    </button>
+                </h2>
+                <div id="faq-4" class="accordion-collapse collapse" data-bs-parent="#qpAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Ha! Agar xizmat sizga ma’qul kelmasa, obuna boshlanganidan so‘ng dastlabki 3 kun ichida to‘liq qaytarib berish kafolati (Money-back guarantee) mavjud. Buning uchun qo‘llab-quvvatlash xizmati yoki administrator bilan bog‘lanish kifoya.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="3d stol tanlash bron qilish joy band qilish">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#faq-5">
+                        <span class="text-purple-400">🪑</span> 3D Stol tanlash tizimi qanday ishlaydi?
+                    </button>
+                </h2>
+                <div id="faq-5" class="accordion-collapse collapse" data-bs-parent="#qpAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Har bir joy sahifasida real zallarning <strong>3D Izometrik xaritasi</strong> mavjud. Siz rozetkaga yaqin, deraza oldidagi yoki Zoom kabinasidagi aniq stolni bosasiz. Stol 3D bo‘yicha ko‘tariladi va 1 ta bosishda buyurtma qilasiz.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Support Contact Box -->
+        <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-3 text-center mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="text-md-start">
+                <h6 class="text-white fw-bold mb-1">Yana boshqa savolingiz bormi?</h6>
+                <p class="text-muted small mb-0">Jasur (AI Maslahatchi) yoki Telegram administratorimizga darhol yozishingiz mumkin.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'ai_service:ai_matchmaker' %}" class="btn btn-zen-secondary btn-sm text-nowrap">
+                    🤖 AI Maslahatchiga yozish
+                </a>
+                <a href="https://t.me/QuietSpaceSupport" target="_blank" class="btn btn-zen-cyan btn-sm text-nowrap">
+                    <i class="bi bi-telegram me-1"></i> Admin Telegram
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('[data-plan-id]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const planId = btn.getAttribute('data-plan-id');
+        const selectField = document.getElementById('id_plan_id');
+        if (selectField) {
+            selectField.value = planId;
+        }
+    });
+});
+
+function filterFaqQuestions() {
+    const input = document.getElementById('faq-search-input');
+    const filter = input.value.toLowerCase().trim();
+    const items = document.querySelectorAll('.faq-item');
+
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const keywords = item.getAttribute('data-keywords') || '';
+        if (text.includes(filter) || keywords.includes(filter)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

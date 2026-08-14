@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ location.name }} — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Top Breadcrumb & Status -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 text-sm">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-muted text-decoration-none">Bosh sahifa</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:explore_map' %}" class="text-muted text-decoration-none">Joylar</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ location.name }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge-live-{{ location.live_status }}">{{ location.live_badge_text }}</span>
+            <span class="badge bg-slate-800 text-slate-300 border border-slate-700">
+                <i class="bi bi-clock me-1"></i>{{ location.working_hours }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Location Header Card with 3D Tilt & Cyber-Nature Glass -->
+    <div class="zen-glass-card p-4 p-md-5 mb-4 position-relative">
+        <svg class="leaf-overlay" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 0 C20 30 20 70 50 100 C80 70 80 30 50 0 Z"/>
+        </svg>
+
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <span class="badge bg-purple-950 text-purple-300 border border-purple-800 px-3 py-1 rounded-pill mb-2">
+                    {{ location.get_category_display }}
+                </span>
+                <h1 class="display-5 fw-extrabold text-white mb-2">{{ location.name }}</h1>
+                <p class="text-muted small fs-6 mb-3">
+                    <i class="bi bi-geo-alt text-emerald-400 me-1"></i>{{ location.address }} ({{ location.get_district_display }})
+                </p>
+                <p class="text-slate-300 small mb-0 max-w-2xl">
+                    {{ location.description }}
+                </p>
+            </div>
+
+            <div class="col-lg-4 text-lg-end">
+                <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-3 d-inline-block text-start">
+                    <span class="text-dim text-xs d-block">Soatlik Boshlang‘ich Narx:</span>
+                    <span class="display-6 fw-extrabold text-white">{{ location.hourly_price|floatformat:0 }} <small class="fs-6 text-muted">so‘m / soat</small></span>
+                    <div class="text-emerald-400 text-xs mt-1"><i class="bi bi-shield-check me-1"></i>QuietPass bilan -{{ active_discount|default:20 }}% gacha chegirma</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-Time Metrics & AI Insights Row -->
+    <div class="row g-4 mb-4">
+        <!-- Live Shovqin & Soundwave -->
+        <div class="col-md-4">
+            <div class="zen-glass-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-dim text-xs fw-bold text-uppercase tracking-wider">Jonli Shovqin Darajasi</span>
+                    <div class="soundwave-meter">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+                </div>
+                <div class="display-5 fw-extrabold text-emerald-400 mb-1">
+                    {{ location.current_db_level|floatformat:1 }} <small class="fs-6 text-muted">dB</small>
+                </div>
+                <p class="text-slate-300 small mb-0">
+                    {% if location.current_db_level < 42 %}
+                        🟢 Mutlaq jimjitlik — chuqur fokus va dasturlash uchun ideal.
+                    {% elif location.current_db_level < 55 %}
+                        🟡 Mayin fon musiqasi — qulay ishlash muhiti.
+                    {% else %}
+                        🔴 Faol va jonli muhit.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Live Internet & Speed Gauge -->
+        <div class="col-md-4">
+            <div class="zen-glass-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-dim text-xs fw-bold text-uppercase tracking-wider">Wi-Fi Internet Sifati</span>
+                    <div class="speed-gauge-wrap" data-speed="{{ location.avg_download_mbps }}">
+                        <svg width="44" height="44" viewBox="0 0 36 36">
+                            <circle class="gauge-bg" cx="18" cy="18" r="15.915" fill="none" stroke-width="3"></circle>
+                            <circle class="gauge-val" cx="18" cy="18" r="15.915" fill="none" stroke-width="3"></circle>
+                        </svg>
+                    </div>
+                </div>
+                <div class="display-5 fw-extrabold text-cyan-400 mb-1">
+                    {{ location.avg_download_mbps|floatformat:0 }} <small class="fs-6 text-muted">Mbps</small>
+                </div>
+                <div class="d-flex gap-3 text-xs text-muted">
+                    <span>Upload: <strong>{{ location.avg_upload_mbps|floatformat:0 }} Mbps</strong></span>
+                    <span>Ping: <strong>{{ location.avg_ping_ms }} ms</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI 3 Pros & 3 Cons Summary -->
+        <div class="col-md-4">
+            <div class="zen-glass-card p-4 h-100">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-robot text-purple-400"></i>
+                    <span class="text-purple-300 text-xs fw-bold text-uppercase tracking-wider">AI Xulosa (3 Pros & Cons)</span>
+                </div>
+                <div class="text-xs text-emerald-400 mb-1">
+                    {% for pro in ai_summary.pros %}
+                    <div>✓ {{ pro }}</div>
+                    {% endfor %}
+                </div>
+                <div class="text-xs text-rose-400 mb-2">
+                    {% for con in ai_summary.cons %}
+                    <div>✗ {{ con }}</div>
+                    {% endfor %}
+                </div>
+                <div class="text-dim text-xs border-top border-slate-800 pt-1">
+                    {{ ai_summary.freshness_note }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 3D INTERACTIVE SEAT BOOKING (Zen Micro-Booking Grid) ── -->
+    <div class="zen-glass-card p-4 p-md-5 mb-5" id="seat-booking-section">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-grid-3x3-gap-fill me-1"></i> 3D Interaktiv Stol Tanlash
+                </span>
+                <h3 class="text-white fw-bold mb-1">Joy va Stolni Tanlang</h3>
+                <p class="text-muted small mb-0">Stol ustiga bosing — Z-o‘qi bo‘yicha ko‘tarilib, tanlanganingiz belgilanadi.</p>
+            </div>
+            <div class="d-flex gap-2 align-items-center text-xs">
+                <span class="d-flex align-items-center gap-1"><span class="status-pulse-dot quiet"></span> Bo‘sh</span>
+                <span class="d-flex align-items-center gap-1 ms-2"><span class="status-pulse-dot moderate"></span> Pending</span>
+                <span class="d-flex align-items-center gap-1 ms-2"><span class="status-pulse-dot busy"></span> Band</span>
+            </div>
+        </div>
+
+        <!-- 3D Seat Grid Stage -->
+        <div class="zen-3d-seat-stage mb-4">
+            <div class="zen-3d-grid">
+                {% for zone in zones %}
+                    {% for table in zone.tables.all %}
+                    <div class="zen-seat-pod {% if forloop.first %}selected{% endif %} {% if table.is_active %}available{% else %}occupied{% endif %}" 
+                         data-table-id="{{ table.id }}" 
+                         data-table-num="{{ table.table_number }}">
+                        <div class="text-dim text-xs mb-1">{{ zone.name }}</div>
+                        <div class="fw-extrabold text-white fs-5 mb-1">#{{ table.table_number }}</div>
+                        <div class="text-xs text-muted">
+                            {% if table.has_outlet %}🔌 220V{% endif %}
+                        </div>
+                        <div class="text-emerald-400 text-xs fw-bold mt-2">
+                            {{ table.effective_hourly_price|floatformat:0 }} so‘m
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <form method="POST" action="{% url 'core:create_booking' location.id %}" class="p-4 bg-slate-900/90 border border-slate-800 rounded-4">
+            {% csrf_token %}
+            <input type="hidden" name="table_id" id="selected-table-input" value="{% if default_table %}{{ default_table.id }}{% endif %}">
+
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label text-slate-300 small">Tanlangan Stol:</label>
+                    <div class="fw-bold text-emerald-400 fs-5" id="selected-table-num-display">
+                        {% if default_table %}#{{ default_table.table_number }}{% else %}Stol tanlang{% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label text-slate-300 small">Sana:</label>
+                    <input type="date" name="booking_date" class="form-control form-control-sm" value="{{ today|date:'Y-m-d' }}" required>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label text-slate-300 small">Boshlanish:</label>
+                    <input type="time" name="start_time" class="form-control form-control-sm" value="10:00" required>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label text-slate-300 small">Tugash:</label>
+                    <input type="time" name="end_time" class="form-control form-control-sm" value="14:00" required>
+                </div>
+
+                <div class="col-md-2 text-end">
+                    <label class="form-label text-transparent d-block small">Amal</label>
+                    <button type="submit" class="btn btn-zen-primary btn-sm w-100 py-2">
+                        <i class="bi bi-check2-circle me-1"></i> Bron Qilish
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Amenities & Facilities -->
+    <div class="zen-glass-card p-4 mb-4">
+        <h5 class="text-white fw-bold mb-3"><i class="bi bi-stars text-emerald-400 me-2"></i>Qulayliklar va Imkoniyatlar</h5>
+        <div class="d-flex flex-wrap gap-2">
+            {% for am in amenities %}
+            <span class="badge bg-slate-900 text-slate-200 border border-slate-800 px-3 py-2 text-sm d-flex align-items-center gap-2">
+                <i class="bi {{ am.icon }} text-emerald-400"></i> {{ am.name }}
+            </span>
+            {% empty %}
+            <span class="text-muted small">Qulayliklar ko‘rsatilmagan.</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

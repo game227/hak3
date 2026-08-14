@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks %}
+
+{% block title %}Tizimga Kirish — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-5 max-w-md mx-auto">
+    <div class="qs-card p-4 p-md-5">
+        <div class="text-center mb-4">
+            <div class="logo-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                <i class="bi bi-soundwave"></i>
+            </div>
+            <h3 class="text-white fw-bold">Tizimga Kirish</h3>
+            <p class="text-muted small">QuietSpace platformasiga xush kelibsiz</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small text-slate-300">Login yoki Username:</label>
+                {% render_field form.username class="form-control" placeholder="Login kiriting" %}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small text-slate-300">Parol:</label>
+                {% render_field form.password class="form-control" placeholder="Parol kiriting" %}
+            </div>
+
+            <button type="submit" class="btn btn-qs-primary btn-lg w-100 justify-content-center py-2 mb-3">
+                Kirish
+            </button>
+
+            <div class="text-center text-muted small">
+                Profilingiz yo‘qmi? <a href="{% url 'accounts:register' %}" class="text-emerald-400 text-decoration-none fw-bold">Ro‘yxatdan o‘tish</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

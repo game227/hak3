@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Jasur — QuietSpace Jonli Maslahatchisi{% endblock %}
+
+{% block content %}
+<div class="container py-4 max-w-4xl mx-auto">
+    <!-- Chat Header Card -->
+    <div class="zen-glass-card p-3 p-md-4 mb-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="position-relative">
+                <div class="user-avatar-sm" style="width: 52px; height: 52px; background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%); font-size: 1.5rem; border: 2px solid rgba(16, 185, 129, 0.5);">
+                    👨‍💻
+                </div>
+                <span class="position-absolute bottom-0 end-0 p-1 bg-emerald-500 border border-dark rounded-circle" style="width: 12px; height: 12px;"></span>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="text-white fw-bold mb-0">Jasur</h4>
+                    <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs px-2 py-1">
+                        Jonli Maslahatchi
+                    </span>
+                </div>
+                <div class="text-dim text-xs">
+                    <span class="text-emerald-400">● Onlayn</span> • Toshkentdagi barcha tinch ishlash joylari eksperti
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-zen-secondary btn-sm" onclick="resetChat()" title="Suhbatni yangilash">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Tozalash
+            </button>
+            <a href="https://t.me/QuietSpace_Tashkent_bot" target="_blank" class="btn btn-zen-cyan btn-sm">
+                <i class="bi bi-telegram me-1"></i> Botda yozish
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Human-Like Chat Window -->
+    <div class="zen-glass-card p-0 d-flex flex-column" style="height: 620px; border-radius: var(--radius-lg);">
+        <!-- Messages Scroll Area -->
+        <div class="flex-grow-1 p-3 p-md-4 overflow-auto d-flex flex-column gap-3" id="chat-messages-box">
+            <!-- Initial Human Welcome Message -->
+            <div class="d-flex gap-3 align-items-start">
+                <div class="user-avatar-sm" style="width: 38px; height: 38px; background: linear-gradient(135deg, #10b981, #38bdf8); flex-shrink: 0; font-size: 1.1rem;">
+                    👨‍💻
+                </div>
+                <div class="p-3 bg-slate-900/95 border border-slate-800 rounded-4 text-slate-200 small position-relative" style="max-width: 82%;">
+                    <div class="fw-bold text-white mb-1">Jasur</div>
+                    <p class="mb-2">
+                        Assalomu alaykum! Men Toshkentdagi barcha kovorking, tinch qahvaxona va kutubxonalarni yaxshi bilaman. 😊
+                    </p>
+                    <p class="mb-2">
+                        Qayerda internet tez, qaysi joyda jimjitlik zo‘r yoki rozetkalar yetarli ekanini aniq aytib bera olaman.
+                    </p>
+                    <p class="mb-0 text-slate-400 text-xs">
+                        Bugun sizga qanday joy kerak? Erkin tilda yozing, birgalikda eng ma’qulini tanlaymiz!
+                    </p>
+                    <div class="text-end text-dim text-xs mt-1" id="initial-time">13:20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator ("Jasur yozmoqda...") -->
+        <div class="px-4 py-2 d-none" id="ai-typing-indicator">
+            <div class="d-flex gap-2 align-items-center text-xs text-slate-400">
+                <span class="fw-bold text-emerald-400">Jasur</span> yozmoqda
+                <div class="spinner-grow text-emerald-400" style="width: 8px; height: 8px;" role="status"></div>
+                <div class="spinner-grow text-cyan-400" style="width: 8px; height: 8px; animation-delay: 0.15s;" role="status"></div>
+                <div class="spinner-grow text-purple-400" style="width: 8px; height: 8px; animation-delay: 0.3s;" role="status"></div>
+            </div>
+        </div>
+
+        <!-- Quick Human Prompt Pills -->
+        <div class="px-3 py-2 border-top border-slate-800 bg-slate-950/70 overflow-auto text-nowrap d-flex gap-2 align-items-center" style="scrollbar-width: thin;">
+            <span class="text-dim text-xs">Takliflar:</span>
+            <button type="button" class="btn btn-sm btn-zen-secondary text-xs py-1 px-3" onclick="sendQuickPrompt('Assalomu alaykum Jasur!')">
+                👋 Salomlashish
+            </button>
+            <button type="button" class="btn btn-sm btn-zen-secondary text-xs py-1 px-3" onclick="sendQuickPrompt('Chorsu atrofida 100 Mbps internet va Zoom uchun tinch joy kerak')">
+                🚀 Chorsuda 100 Mbps + Zoom
+            </button>
+            <button type="button" class="btn btn-sm btn-zen-secondary text-xs py-1 px-3" onclick="sendQuickPrompt('Dasturlash uchun 24/7 ochiq bo‘lgan eng sokin kovorking qaysi?')">
+                💻 24/7 Sokin Kovorking
+            </button>
+            <button type="button" class="btn btn-sm btn-zen-secondary text-xs py-1 px-3" onclick="sendQuickPrompt('Mirobod tumanida qahva ichib ishlash uchun sokin kafe bormi?')">
+                ☕️ Mirobod sokin kafe
+            </button>
+            <button type="button" class="btn btn-sm btn-zen-secondary text-xs py-1 px-3" onclick="sendQuickPrompt('Kitob o‘qish uchun arzon va mutlaq jimjit kutubxona kerak')">
+                📚 Mutlaq jimjit kutubxona
+            </button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="p-3 border-top border-slate-800 bg-slate-900/90">
+            <form id="chat-form" onsubmit="event.preventDefault(); submitChatMessage();" class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-zen-secondary btn-sm px-3" onclick="startVoiceChat()" title="Ovozli xabar gapirish (Mikrofon)">
+                    <i class="bi bi-mic-fill text-emerald-400" id="mic-icon"></i>
+                </button>
+
+                <input type="text" id="chat-input" class="form-control bg-slate-950 border-slate-700 text-white" placeholder="Jasurga xabar yozing (masalan: 'Chorsuda tinch joy bormi?')..." required autocomplete="off">
+
+                <button type="submit" class="btn btn-zen-primary btn-sm px-4 py-2 text-nowrap" id="chat-send-btn">
+                    <i class="bi bi-send-fill me-1"></i> Yuborish
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let chatHistory = [];
+    const initialQuery = "{{ initial_query|default:''|escapejs }}";
+
+    function getCurrentTimeStr() {
+        const now = new Date();
+        return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const initTimeEl = document.getElementById('initial-time');
+        if (initTimeEl) initTimeEl.textContent = getCurrentTimeStr();
+
+        if (initialQuery) {
+            sendQuickPrompt(initialQuery);
+        }
+    });
+
+    function sendQuickPrompt(text) {
+        const input = document.getElementById('chat-input');
+        input.value = text;
+        submitChatMessage();
+    }
+
+    async function submitChatMessage() {
+        const input = document.getElementById('chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        input.value = '';
+        appendUserMessage(msg);
+        showTypingIndicator(true);
+
+        const startTime = Date.now();
+
+        try {
+            const response = await fetch('/ai/api/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: msg,
+                    history: chatHistory
+                })
+            });
+
+            const data = await response.json();
+            
+            // Natural human typing delay (~0.8s minimum)
+            const elapsedTime = Date.now() - startTime;
+            const remainingDelay = Math.max(0, 800 - elapsedTime);
+
+            setTimeout(() => {
+                showTypingIndicator(false);
+                if (data.status === 'success') {
+                    appendAIMessage(data.reply, data.locations, data.provider);
+                    chatHistory.push({ role: 'user', content: msg });
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    appendAIMessage("Kechirasiz, biroz tushunarsiz bo‘ldi. Iltimos, qaytadan yozib bera olasizmi?", []);
+                }
+            }, remainingDelay);
+
+        } catch (e) {
+            showTypingIndicator(false);
+            appendAIMessage("Aloqa biroz sekinlashdi. Iltimos, internetingizni tekshirib qaytadan urinib ko‘ring.", []);
+        }
+    }
+
+    function appendUserMessage(text) {
+        const box = document.getElementById('chat-messages-box');
+        const timeStr = getCurrentTimeStr();
+        const msgHtml = `
+            <div class="d-flex gap-2 align-items-start justify-content-end">
+                <div class="p-3 bg-emerald-950/80 border border-emerald-800/80 rounded-4 text-white small position-relative" style="max-width: 80%;">
+                    <div>${escapeHtml(text)}</div>
+                    <div class="text-end text-emerald-300 text-xs mt-1" style="font-size: 10px;">
+                        ${timeStr} <i class="bi bi-check2-all text-cyan-400 ms-1"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        box.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+    }
+
+    function appendAIMessage(text, locations, provider) {
+        const box = document.getElementById('chat-messages-box');
+        const timeStr = getCurrentTimeStr();
+        
+        let locCardsHtml = '';
+        if (locations && locations.length > 0) {
+            locCardsHtml = `
+                <div class="row g-2 mt-2">
+                    ${locations.map(loc => `
+                        <div class="col-md-6">
+                            <div class="p-3 bg-slate-950 border border-slate-800 rounded-3 hover-border-emerald transition-all">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="text-white fw-bold mb-0">${loc.name}</h6>
+                                    <span class="badge-live-${loc.live_status} text-xs">${loc.live_status_text}</span>
+                                </div>
+                                <div class="text-dim text-xs mb-2">${loc.district} • ${loc.category}</div>
+                                
+                                <div class="d-flex gap-2 text-xs mb-2">
+                                    <span class="text-emerald-400">🎧 ${Math.round(loc.current_db_level)} dB</span>
+                                    <span class="text-cyan-400">⚡️ ${Math.round(loc.avg_download_mbps)} Mbps</span>
+                                    <span class="text-white fw-bold ms-auto">${Math.round(loc.hourly_price).toLocaleString()} so‘m/s</span>
+                                </div>
+
+                                <div class="d-flex gap-1 pt-1">
+                                    <a href="/locations/${loc.slug}/" class="btn btn-zen-primary btn-sm py-1 px-2 text-xs flex-grow-1 text-center text-decoration-none">
+                                        📅 3D Stol Bron
+                                    </a>
+                                    <a href="/explore/?q=${encodeURIComponent(loc.name)}" class="btn btn-zen-secondary btn-sm py-1 px-2 text-xs text-decoration-none">
+                                        📍 Xarita
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        const formattedText = text.replace(/\n/g, '<br>');
+
+        const msgHtml = `
+            <div class="d-flex gap-3 align-items-start">
+                <div class="user-avatar-sm" style="width: 38px; height: 38px; background: linear-gradient(135deg, #10b981, #38bdf8); flex-shrink: 0; font-size: 1.1rem;">
+                    👨‍💻
+                </div>
+                <div class="p-3 bg-slate-900/95 border border-slate-800 rounded-4 text-slate-200 small" style="max-width: 85%;">
+                    <div class="fw-bold text-white mb-1">Jasur</div>
+                    <div>${formattedText}</div>
+                    ${locCardsHtml}
+                    <div class="d-flex justify-content-between align-items-center text-dim text-xs mt-2 pt-1 border-top border-slate-800/60" style="font-size: 10px;">
+                        <span>${timeStr}</span>
+                        <div class="d-flex gap-1">
+                            <span class="cursor-pointer" onclick="this.style.transform='scale(1.3)'">👍</span>
+                            <span class="cursor-pointer" onclick="this.style.transform='scale(1.3)'">❤️</span>
+                            <span class="cursor-pointer" onclick="this.style.transform='scale(1.3)'">💡</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        box.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+    }
+
+    function showTypingIndicator(show) {
+        const ind = document.getElementById('ai-typing-indicator');
+        if (show) {
+            ind.classList.remove('d-none');
+        } else {
+            ind.classList.add('d-none');
+        }
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        const box = document.getElementById('chat-messages-box');
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function resetChat() {
+        chatHistory = [];
+        const box = document.getElementById('chat-messages-box');
+        const timeStr = getCurrentTimeStr();
+        box.innerHTML = `
+            <div class="d-flex gap-3 align-items-start">
+                <div class="user-avatar-sm" style="width: 38px; height: 38px; background: linear-gradient(135deg, #10b981, #38bdf8); flex-shrink: 0; font-size: 1.1rem;">
+                    👨‍💻
+                </div>
+                <div class="p-3 bg-slate-900/95 border border-slate-800 rounded-4 text-slate-200 small" style="max-width: 85%;">
+                    <div class="fw-bold text-white mb-1">Jasur</div>
+                    <p class="mb-1">Suhbat yangilandi! Bugun sizga qanday ishlash joyi topib beray? 😊</p>
+                    <div class="text-end text-dim text-xs mt-1" style="font-size: 10px;">${timeStr}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function startVoiceChat() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("Brauzeringiz ovozli qidiruvni qo‘llab-quvvatlamaydi. Iltimos, matn orqali yozing.");
+            return;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'uz-UZ';
+        recognition.interimResults = false;
+
+        const micIcon = document.getElementById('mic-icon');
+        micIcon.className = 'bi bi-record-circle text-danger';
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('chat-input').value = transcript;
+            micIcon.className = 'bi bi-mic-fill text-emerald-400';
+            submitChatMessage();
+        };
+
+        recognition.onerror = function() {
+            micIcon.className = 'bi bi-mic-fill text-emerald-400';
+        };
+
+        recognition.onend = function() {
+            micIcon.className = 'bi bi-mic-fill text-emerald-400';
+        };
+
+        recognition.start();
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+{% endblock %}

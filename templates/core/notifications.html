@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bildirishnomalar — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-4 max-w-2xl mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-white mb-0"><i class="bi bi-bell-fill text-emerald-400 me-2"></i>Bildirishnomalar</h3>
+        <span class="text-muted small">Jami: {{ notifications.count }} ta</span>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+        {% for n in notifications %}
+        <div class="qs-card p-3 d-flex align-items-start gap-3">
+            <div class="metric-icon-wrap" style="width: 44px; height: 44px; min-width: 44px; background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                <i class="bi bi-info-circle fs-5"></i>
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h6 class="text-white fw-bold mb-1">{{ n.title }}</h6>
+                    <span class="text-dim text-xs">{{ n.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <p class="text-slate-300 small mb-0">{{ n.message }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="qs-card p-5 text-center text-muted">
+            <i class="bi bi-bell-slash display-5 d-block mb-3"></i>
+            <h5 class="text-white">Sizda hali yangi bildirishnomalar yo‘q</h5>
+            <p class="text-muted small mb-0">Buyurtmalar va to‘lov holatlari shu yerda ko‘rinadi.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

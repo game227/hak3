@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}To‘lovlar Boshqaruvi (Payment Admin) — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-lg-4 py-4">
+    <!-- Top Stats & Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="text-white mb-1"><i class="bi bi-credit-card-2-front text-emerald-400 me-2"></i>To‘lovlar Boshqaruvi</h2>
+            <p class="text-muted small mb-0">QuietPass obunalari va Booking to‘lovlarini tekshirish, tasdiqlash (ACCEPT) va rad etish (REJECT)</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'core:admin_audits' %}" class="btn btn-qs-secondary btn-sm">
+                <i class="bi bi-journal-text me-1"></i> Audit Log jurnali
+            </a>
+            <a href="/admin/payments/payment/" class="btn btn-qs-outline btn-sm">
+                <i class="bi bi-sliders me-1"></i> Django Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3 border-amber-800/40">
+                <div class="text-dim small">Kutilayotgan (PENDING):</div>
+                <div class="fs-3 fw-bold text-amber-400">{{ stats.pending }} ta</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3 border-emerald-800/40">
+                <div class="text-dim small">Tasdiqlangan (PAID):</div>
+                <div class="fs-3 fw-bold text-emerald-400">{{ stats.paid }} ta</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3 border-rose-800/40">
+                <div class="text-dim small">Rad etilgan (REJECTED):</div>
+                <div class="fs-3 fw-bold text-rose-400">{{ stats.rejected }} ta</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="qs-card p-3 border-blue-800/40">
+                <div class="text-dim small">Jami o‘rtacha to‘lov:</div>
+                <div class="fs-3 fw-bold text-blue-400">{{ stats.total_volume|floatformat:0 }} so‘m</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="d-flex gap-2 mb-3">
+        <a href="?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-warning text-dark fw-bold{% else %}btn-qs-secondary{% endif %}">
+            Kutilmoqda (Pending)
+        </a>
+        <a href="?status=paid" class="btn btn-sm {% if status_filter == 'paid' %}btn-success fw-bold{% else %}btn-qs-secondary{% endif %}">
+            Qabul qilingan (Paid)
+        </a>
+        <a href="?status=rejected" class="btn btn-sm {% if status_filter == 'rejected' %}btn-danger fw-bold{% else %}btn-qs-secondary{% endif %}">
+            Rad etilgan (Rejected)
+        </a>
+        <a href="?status=all" class="btn btn-sm {% if status_filter == 'all' %}btn-light fw-bold text-dark{% else %}btn-qs-secondary{% endif %}">
+            Barchasi
+        </a>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="qs-card p-0 overflow-hidden mb-5">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead class="bg-slate-900 border-slate-800 text-muted small text-uppercase">
+                    <tr>
+                        <th class="py-3 px-3">Tranzaksiya ID</th>
+                        <th>Foydalanuvchi</th>
+                        <th>To‘lov turi</th>
+                        <th>Provayder</th>
+                        <th>Summa</th>
+                        <th>Chek / Skrinshot</th>
+                        <th>Sana va Vaqt</th>
+                        <th>Holati</th>
+                        <th class="text-end px-3">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800 text-sm">
+                    {% for p in payments %}
+                    <tr>
+                        <td class="px-3 fw-bold font-monospace text-emerald-400">
+                            {{ p.transaction_id }}
+                            {% if p.booking %}
+                            <div class="text-dim text-xs">Booking #{{ p.booking.booking_code }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.subscription_request %}
+                            <div class="fw-bold text-white">{{ p.subscription_request.full_name }}</div>
+                            <div class="text-dim text-xs">Tel: <strong>{{ p.subscription_request.phone }}</strong> {% if p.subscription_request.telegram %}| TG: {{ p.subscription_request.telegram }}{% endif %}</div>
+                            {% if p.subscription_request.note %}
+                            <div class="text-amber-300 text-xs mt-1 fst-italic">"{{ p.subscription_request.note }}"</div>
+                            {% endif %}
+                            {% else %}
+                            <div class="fw-bold text-white">{{ p.user.first_name|default:p.user.username }}</div>
+                            <div class="text-dim text-xs">@{{ p.user.username }} ({{ p.user.phone_number|default:'Tel yo‘q' }})</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-slate-800 text-slate-300">
+                                {{ p.get_payment_type_display }}
+                            </span>
+                            {% if p.quietpass %}
+                            <div class="text-purple-400 text-xs mt-1">{{ p.quietpass.plan_name }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-blue-950 text-blue-300 border border-blue-800">
+                                {{ p.get_provider_display }}
+                            </span>
+                        </td>
+                        <td class="fw-bold text-white fs-6">
+                            {{ p.amount|floatformat:0 }} so‘m
+                        </td>
+                        <td>
+                            {% if p.receipt_image %}
+                            <a href="{{ p.receipt_image.url }}" target="_blank" class="btn btn-sm btn-outline-info py-0 px-2 text-xs">
+                                <i class="bi bi-image me-1"></i>Chekni ko‘rish
+                            </a>
+                            {% else %}
+                            <span class="text-dim small">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-dim small">
+                            {{ p.created_at|date:"d.m.Y H:i" }}
+                        </td>
+                        <td>
+                            {% if p.status == 'pending' %}
+                            <span class="badge bg-amber-950 text-amber-300 border border-amber-800">Kutilmoqda</span>
+                            {% elif p.status == 'paid' %}
+                            <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800">Qabul qilingan</span>
+                            {% elif p.status == 'rejected' %}
+                            <span class="badge bg-rose-950 text-rose-300 border border-rose-800">Rad etilgan</span>
+                            {% else %}
+                            <span class="badge bg-slate-800 text-slate-400">{{ p.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end px-3">
+                            {% if p.status == 'pending' %}
+                            <div class="d-flex justify-content-end gap-1">
+                                <!-- Accept Form -->
+                                <form method="POST" action="{% url 'core:admin_payment_action' p.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="accept">
+                                    <button type="submit" class="btn btn-sm btn-success px-2 py-1 text-xs" title="Tasdiqlash va faollashtirish">
+                                        <i class="bi bi-check-lg me-1"></i>ACCEPT
+                                    </button>
+                                </form>
+
+                                <!-- Reject Form -->
+                                <form method="POST" action="{% url 'core:admin_payment_action' p.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-1 text-xs" title="Rad etish">
+                                        <i class="bi bi-x-lg me-1"></i>REJECT
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="text-dim small">Tekshirildi ({% if p.processed_by %}{{ p.processed_by.username }}{% else %}Auto{% endif %})</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            To‘lovlar mavjud emas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Audit Logs Section -->
+    <div class="qs-card p-4">
+        <h5 class="text-white mb-3"><i class="bi bi-journal-check text-purple-400 me-2"></i>Oxirgi Audit Qaydnomalari (Audit Log)</h5>
+        <div class="d-flex flex-column gap-2">
+            {% for a in recent_audits %}
+            <div class="p-2 bg-slate-900 border border-slate-800 rounded-3 d-flex justify-content-between align-items-center small">
+                <div>
+                    <strong class="text-emerald-400">[{{ a.get_action_display }}]</strong> 
+                    <span class="text-slate-300">{{ a.details }}</span>
+                </div>
+                <div class="text-dim text-xs">
+                    {{ a.created_at|date:"d.m.Y H:i:s" }} by <strong>{{ a.admin_user.username|default:'System' }}</strong>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-muted small">Hozircha audit yozuvlari yo‘q.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

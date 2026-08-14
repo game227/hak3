@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QuietSpace Tashkent — Tinch Ishlash Joylari Ekotizimi{% endblock %}</title>
+    
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom Cyber-Nature Design System Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cyber_nature.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Fullscreen Interactive Nature Background (Floating Dandelions & Glowing Butterflies) -->
+    <canvas id="nature-bg"></canvas>
+
+    <!-- Floating Ambient Nature Audio Synthesizer Widget -->
+    <div class="ambient-audio-widget" id="zen-audio-toggle" onclick="toggleZenSoundboardDrawer(event)" title="Tabiat tovushlari menyusini ochish">
+        <i class="bi bi-soundwave text-emerald-400 fs-5"></i>
+        <span class="text-white text-xs fw-bold" id="zen-audio-title">🔊 Sokin Ambience</span>
+        <div class="zen-eq-wrap d-none" id="zen-eq-bars">
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+        </div>
+        <i class="bi bi-chevron-up text-slate-400 text-xs ms-1"></i>
+    </div>
+
+    <!-- Zen Soundboard Drawer / Modal (9 Soundscapes) -->
+    <div class="zen-soundboard-modal" id="zen-soundboard-modal">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-music-note-beamed text-emerald-400"></i>
+                <span class="fw-bold text-white text-sm">Zen Sokinlik Tovushlari</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-link text-slate-400 p-0 text-decoration-none" onclick="toggleZenSoundboardDrawer(event)">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- 9 Procedural Sound Choices Grid -->
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="rain" onclick="selectZenSound('rain')">
+                    <span>🌧</span> Zen Yomg‘ir
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="wind" onclick="selectZenSound('wind')">
+                    <span>🍃</span> O‘rmon Shamoli
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="birds" onclick="selectZenSound('birds')">
+                    <span>🐦</span> Bahoriy Qushlar
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="stream" onclick="selectZenSound('stream')">
+                    <span>🌊</span> Tog‘ Soyi
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="ocean" onclick="selectZenSound('ocean')">
+                    <span>🌊</span> Okean To‘lqini
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="campfire" onclick="selectZenSound('campfire')">
+                    <span>🪵</span> Tungi Gulxan
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="crickets" onclick="selectZenSound('crickets')">
+                    <span>🦗</span> Chigirtkalar
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="zen-sound-card" data-sound="cafe" onclick="selectZenSound('cafe')">
+                    <span>☕️</span> Sokin Qahvaxona
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="zen-sound-card" data-sound="focus432" onclick="selectZenSound('focus432')">
+                    <span>🧠</span> 432 Hz Deep Focus (Alpha Waves)
+                </div>
+            </div>
+        </div>
+
+        <!-- Volume Controller -->
+        <div class="p-2 bg-slate-900 border border-slate-800 rounded-3 mb-2">
+            <div class="d-flex justify-content-between align-items-center text-xs text-slate-300 mb-1">
+                <span>Ovoz balandligi:</span>
+                <span class="text-emerald-400 fw-bold" id="zen-volume-label">25%</span>
+            </div>
+            <input type="range" class="form-range" min="0" max="1" step="0.05" value="0.25" oninput="window.zenAudio.setVolume(this.value); document.getElementById('zen-volume-label').textContent = Math.round(this.value * 100) + '%';">
+        </div>
+
+        <button type="button" class="btn btn-sm btn-outline-danger w-100 py-1 text-xs" onclick="window.zenAudio.stop(); updateZenAudioUI(null, false);">
+            <i class="bi bi-stop-circle me-1"></i> Tovushni To‘xtatish
+        </button>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark border-bottom border-slate-800/80 sticky-top" style="background: rgba(11, 19, 31, 0.88); backdrop-filter: blur(20px); z-index: 100;">
+        <div class="container py-1">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:home' %}">
+                <div class="logo-icon">
+                    <i class="bi bi-soundwave"></i>
+                </div>
+                <span class="fw-bold tracking-wide text-white">Quiet<span class="text-emerald-400">Space</span></span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-slate-300 hover-white px-3" href="{% url 'core:explore_map' %}">
+                            <i class="bi bi-compass me-1 text-emerald-400"></i> Xarita & Joylar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-slate-300 hover-white px-3" href="{% url 'ai_service:ai_matchmaker' %}">
+                            <i class="bi bi-stars me-1 text-purple-400"></i> AI Matchmaker
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-slate-300 hover-white px-3" href="{% url 'measurements:speedtest' %}">
+                            <i class="bi bi-speedometer2 me-1 text-blue-400"></i> Speedtest (+10 ball)
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-slate-300 hover-white px-3" href="{% url 'core:quietpass' %}">
+                            <i class="bi bi-shield-check me-1 text-amber-400"></i> QuietPass
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.is_authenticated %}
+                        {% if user.is_superuser or user.is_staff or user.role == 'superadmin' or user.role == 'moderator' or user.role == 'payment_admin' %}
+                            <a href="/admin/" target="_blank" class="btn btn-sm btn-zen-primary shadow-sm text-nowrap">
+                                <i class="bi bi-shield-lock-fill me-1"></i> Admin Panel
+                            </a>
+                        {% endif %}
+
+                        {% if user.is_b2b_owner or user.is_superuser %}
+                            <a href="{% url 'b2b:dashboard' %}" class="btn btn-sm btn-outline-warning text-nowrap">
+                                <i class="bi bi-building me-1"></i> B2B Kabinet
+                            </a>
+                        {% endif %}
+
+                        {% if user.is_payment_admin_user or user.is_superuser %}
+                            <a href="{% url 'core:admin_payments' %}" class="btn btn-sm btn-outline-purple text-nowrap">
+                                <i class="bi bi-credit-card-2-front me-1"></i> To‘lovlar
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'core:notifications' %}" class="btn btn-icon-glass position-relative text-slate-300" title="Bildirishnomalar">
+                            <i class="bi bi-bell"></i>
+                            {% if unread_notifications_count > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-emerald-500 text-white text-xs">
+                                {{ unread_notifications_count }}
+                            </span>
+                            {% endif %}
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="btn btn-user-dropdown dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <div class="user-avatar-sm">
+                                    {{ user.first_name|default:user.username|slice:":1"|upper }}
+                                </div>
+                                <div class="text-start d-none d-md-block">
+                                    <span class="d-block fw-bold text-white text-xs">{{ user.first_name|default:user.username }}</span>
+                                    <span class="text-emerald-400 text-xs"><i class="bi bi-coin me-1"></i>{{ user.points }} ball</span>
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg border-slate-800">
+                                {% if user.is_superuser or user.is_staff or user.role == 'superadmin' or user.role == 'moderator' or user.role == 'payment_admin' %}
+                                    <li><a class="dropdown-item py-2 text-emerald-400 fw-bold" href="/admin/" target="_blank"><i class="bi bi-shield-lock me-2"></i> Django Admin</a></li>
+                                    <li><a class="dropdown-item py-2 text-purple-400 fw-bold" href="{% url 'core:admin_payments' %}"><i class="bi bi-credit-card-2-front me-2"></i> To‘lovlar Boshqaruvi</a></li>
+                                    <li><hr class="dropdown-divider border-slate-800"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item py-2" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i> Mening Profilim</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'core:my_bookings' %}"><i class="bi bi-ticket-perforated me-2"></i> Mening Buyurtmalarim</a></li>
+                                <li><hr class="dropdown-divider border-slate-800"></li>
+                                <li>
+                                    <form method="POST" action="{% url 'accounts:logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2 text-rose-400"><i class="bi bi-box-arrow-right me-2"></i> Chiqish</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-zen-secondary btn-sm">Kirish</a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-zen-primary btn-sm">Ro‘yxatdan o‘tish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Flash Messages -->
+    {% if messages %}
+    <div class="container pt-3" style="position: relative; z-index: 10;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show border-0 shadow-lg text-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <main style="position: relative; z-index: 2; min-height: 80vh;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top border-slate-800/80 py-5 mt-5" style="background: rgba(7, 12, 20, 0.95); position: relative; z-index: 5;">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="logo-icon" style="width: 32px; height: 32px; font-size: 1.1rem;">
+                            <i class="bi bi-soundwave"></i>
+                        </div>
+                        <span class="fw-bold tracking-wide text-white fs-5">Quiet<span class="text-emerald-400">Space</span></span>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        Toshkent shahridagi eng tinch, tezkor internet va qulay ish sharoitlariga ega bo‘lgan kovorking, kafe va kutubxonalar ekotizimi.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="https://t.me/QuietSpace_Tashkent_bot" target="_blank" class="btn btn-sm btn-icon-glass text-slate-300"><i class="bi bi-telegram text-info"></i></a>
+                        <a href="https://instagram.com/quietspace_tashkent" target="_blank" class="btn btn-sm btn-icon-glass text-slate-300"><i class="bi bi-instagram text-rose-400"></i></a>
+                        <a href="tel:+998712000011" class="btn btn-sm btn-icon-glass text-slate-300"><i class="bi bi-telephone text-emerald-400"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white text-uppercase tracking-wider small fw-bold mb-3">Bo‘limlar</h6>
+                    <ul class="list-unstyled text-sm text-muted">
+                        <li class="mb-2"><a href="{% url 'core:explore_map' %}" class="text-muted text-decoration-none hover-white">Xarita & Joylar</a></li>
+                        <li class="mb-2"><a href="{% url 'ai_service:ai_matchmaker' %}" class="text-muted text-decoration-none hover-white">AI Matchmaker</a></li>
+                        <li class="mb-2"><a href="{% url 'measurements:speedtest' %}" class="text-muted text-decoration-none hover-white">Speedtest & Ballar</a></li>
+                        <li class="mb-2"><a href="{% url 'core:quietpass' %}" class="text-muted text-decoration-none hover-white">QuietPass Obunasi</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <h6 class="text-white text-uppercase tracking-wider small fw-bold mb-3">Hamkorlik & B2B</h6>
+                    <ul class="list-unstyled text-sm text-muted">
+                        <li class="mb-2"><a href="{% url 'b2b:dashboard' %}" class="text-muted text-decoration-none hover-white">Biznes Kabineti</a></li>
+                        <li class="mb-2"><a href="{% url 'b2b:checkin' %}" class="text-muted text-decoration-none hover-white">QR Check-in</a></li>
+                        <li class="mb-2"><a href="{% url 'b2b:promotions' %}" class="text-muted text-decoration-none hover-white">Aksiyalar e’lon qilish</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h6 class="text-white text-uppercase tracking-wider small fw-bold mb-3">Telegram Bot</h6>
+                    <p class="text-muted small mb-2">Yagona ma’lumotlar bazasi bilan ishlovchi rasmiy botimiz:</p>
+                    <a href="https://t.me/QuietSpace_Tashkent_bot" target="_blank" class="btn btn-zen-cyan btn-sm w-100">
+                        <i class="bi bi-telegram me-1"></i> @QuietSpace_Tashkent_bot
+                    </a>
+                </div>
+            </div>
+            <div class="border-top border-slate-800/80 mt-4 pt-4 text-center text-dim text-xs">
+                © 2026 QuietSpace Tashkent. Barcha huquqlar himoyalangan. Peaceful Cyber-Nature Engine.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Core Interactive Scripts -->
+    <script src="{% static 'js/nature_canvas.js' %}"></script>
+    <script src="{% static 'js/ambient_audio.js' %}"></script>
+    <script src="{% static 'js/cyber_nature.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

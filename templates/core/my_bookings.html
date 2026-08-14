@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mening Buyurtmalarim — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-white mb-1"><i class="bi bi-ticket-perforated text-emerald-400 me-2"></i>Mening Buyurtmalarim</h2>
+            <p class="text-muted small mb-0">Bron qilingan stollar, QR-kodlar va tashrif holati</p>
+        </div>
+        <a href="{% url 'core:explore_map' %}" class="btn btn-qs-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i> Yangi joy bron qilish
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for b in bookings %}
+        <div class="col-lg-6">
+            <div class="qs-card h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <!-- Top Info & Status -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-slate-900 border border-slate-700 text-emerald-400 fs-6 fw-bold px-3 py-1 mb-1 d-inline-block">
+                                #{{ b.booking_code }}
+                            </span>
+                            <div class="text-dim text-xs">Yaratilgan: {{ b.created_at|date:"d.m.Y H:i" }}</div>
+                        </div>
+                        <span class="badge {{ b.status_badge_class }} px-3 py-2 rounded-pill small">
+                            {{ b.get_status_display }}
+                        </span>
+                    </div>
+
+                    <h4 class="text-white mb-1">{{ b.location.name }}</h4>
+                    <p class="text-muted small mb-3"><i class="bi bi-geo-alt me-1 text-emerald-400"></i>{{ b.location.address }}</p>
+
+                    <!-- Booking Schedule Details -->
+                    <div class="p-3 bg-slate-900 border border-slate-800 rounded-3 mb-3">
+                        <div class="row g-2 text-sm">
+                            <div class="col-6">
+                                <span class="text-dim small d-block">Sana:</span>
+                                <span class="text-white fw-bold"><i class="bi bi-calendar3 me-1 text-blue-400"></i>{{ b.booking_date|date:"d.m.Y" }}</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-dim small d-block">Vaqt:</span>
+                                <span class="text-white fw-bold"><i class="bi bi-clock me-1 text-emerald-400"></i>{{ b.start_time|time:"H:i" }} - {{ b.end_time|time:"H:i" }}</span>
+                            </div>
+                            <div class="col-6 mt-2">
+                                <span class="text-dim small d-block">Stol / Zona:</span>
+                                <span class="text-white">{% if b.table %}Stol #{{ b.table.table_number }} ({{ b.zone.name }}){% else %}{{ b.zone.name|default:'Umumiy' }}{% endif %}</span>
+                            </div>
+                            <div class="col-6 mt-2">
+                                <span class="text-dim small d-block">To‘langan summa:</span>
+                                <span class="text-emerald-400 fw-bold">{{ b.total_price|floatformat:0 }} so‘m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Check-in Instruction Box -->
+                    {% if b.status == 'confirmed' %}
+                    <div class="p-3 bg-emerald-950/40 border border-emerald-800/60 rounded-3 mb-3 text-center">
+                        <div class="text-emerald-300 small fw-bold mb-1"><i class="bi bi-qr-code me-1"></i>Joyida ko‘rsatish uchun Check-in kodi:</div>
+                        <div class="display-6 fw-extrabold text-white letter-spacing-2">{{ b.booking_code }}</div>
+                        <div class="text-dim text-xs mt-1">Joyga borganda xodimga shu kodni ko‘rsating yoki skaner qildiring.</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top border-slate-800 mt-2">
+                    <a href="{% url 'core:location_detail' b.location.slug %}" class="btn btn-qs-secondary btn-sm">
+                        <i class="bi bi-arrow-up-right me-1"></i> Joy sahifasi
+                    </a>
+
+                    {% if b.status in 'pending,confirmed' %}
+                    <form method="POST" action="{% url 'core:cancel_booking' b.id %}" onsubmit="return confirm('Haqiqatan ham buyurtmani bekor qilmoqchimisiz?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-x-circle me-1"></i> Bekor qilish
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="qs-card p-5 max-w-md mx-auto">
+                <i class="bi bi-calendar-x display-4 text-muted d-block mb-3"></i>
+                <h4 class="text-white">Sizda hali faol buyurtmalar yo‘q</h4>
+                <p class="text-muted small mb-4">Toshkentdagi eng tinch kovorking va kafelardan birini tanlab, hoziroq stol bron qiling.</p>
+                <a href="{% url 'core:explore_map' %}" class="btn btn-qs-primary">Joy tanlash</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

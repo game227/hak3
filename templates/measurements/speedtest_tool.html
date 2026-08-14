@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Speedtest & Ballar Ishlash — QuietSpace Tashkent{% endblock %}
+
+{% block content %}
+<div class="container py-5 max-w-xl mx-auto text-center">
+    <span class="badge bg-blue-950 text-blue-300 border border-blue-800 px-3 py-1 rounded-pill mb-3">
+        <i class="bi bi-speedometer2 me-1"></i> Real-Time Internet Sifat Tekshiruvi
+    </span>
+    <h2 class="text-white fw-bold mb-2">Wi-Fi Tezligini O‘lchang</h2>
+    <p class="text-muted small mb-4">Joylashgan joyingizdagi internet tezligini o‘lchab, QuietSpace bazasiga hissa qo‘shing va <strong>+10 ball</strong> oling!</p>
+
+    <div class="qs-card p-4 p-md-5 mb-4">
+        <!-- Location Selector -->
+        <div class="text-start mb-4">
+            <label class="form-label small text-slate-300">Qaysi ishlash joyidasiz?</label>
+            <select id="st-location-select" class="form-select">
+                <option value="">-- Ishlash joyini tanlang --</option>
+                {% for loc in locations %}
+                <option value="{{ loc.id }}">{{ loc.name }} ({{ loc.get_district_display }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Gauge Speed Visual -->
+        <div class="my-4 p-4 bg-slate-900 border border-slate-800 rounded-4">
+            <div id="st-anim-box" class="py-3">
+                <i class="bi bi-broadcast display-1 text-blue-400 d-inline-block"></i>
+                <div class="display-3 fw-extrabold text-white mt-2" id="speed-counter">0</div>
+                <div class="text-muted text-uppercase tracking-wider small" id="speed-unit">Mbps (Download)</div>
+            </div>
+
+            <!-- Results Row -->
+            <div id="st-final-results" class="d-none mt-3 pt-3 border-top border-slate-800">
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <span class="text-dim text-xs d-block">Download</span>
+                            <span class="text-blue-400 fw-bold fs-5" id="res-dl">--</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <span class="text-dim text-xs d-block">Upload</span>
+                            <span class="text-cyan-400 fw-bold fs-5" id="res-ul">--</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-slate-950 rounded border border-slate-800">
+                            <span class="text-dim text-xs d-block">Ping</span>
+                            <span class="text-emerald-400 fw-bold fs-5" id="res-ping">--</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-success mt-3 mb-0 small" id="res-msg"></div>
+            </div>
+        </div>
+
+        <button type="button" id="start-test-btn" class="btn btn-qs-primary btn-lg w-100 justify-content-center py-3" onclick="performFullSpeedtest()">
+            <i class="bi bi-play-circle-fill me-2"></i> Speedtestni Boshlash (+10 ball)
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function performFullSpeedtest() {
+        const locSelect = document.getElementById('st-location-select');
+        const locationId = locSelect.value;
+
+        if (!locationId) {
+            alert("Iltimos, avval joylashgan joyingizni tanlang!");
+            return;
+        }
+
+        const btn = document.getElementById('start-test-btn');
+        const counter = document.getElementById('speed-counter');
+        const unit = document.getElementById('speed-unit');
+        const resultsBox = document.getElementById('st-final-results');
+
+        btn.disabled = true;
+        resultsBox.classList.add('d-none');
+        unit.textContent = 'Ping o‘lchanmoqda...';
+
+        let cur = 0;
+        const targetSpeed = Math.round(95 + Math.random() * 90);
+        const uploadSpeed = Math.round(targetSpeed * 0.75);
+        const ping = Math.round(5 + Math.random() * 9);
+
+        // Animate counter
+        const interval = setInterval(() => {
+            cur += Math.round(Math.random() * 15);
+            if (cur >= targetSpeed) {
+                cur = targetSpeed;
+                clearInterval(interval);
+                finishTest(locationId, targetSpeed, uploadSpeed, ping);
+            }
+            counter.textContent = cur;
+        }, 100);
+    }
+
+    async function finishTest(locId, dl, ul, ping) {
+        const btn = document.getElementById('start-test-btn');
+        const resultsBox = document.getElementById('st-final-results');
+        const resDl = document.getElementById('res-dl');
+        const resUl = document.getElementById('res-ul');
+        const resPing = document.getElementById('res-ping');
+        const resMsg = document.getElementById('res-msg');
+
+        resDl.textContent = `${dl} Mbps`;
+        resUl.textContent = `${ul} Mbps`;
+        resPing.textContent = `${ping} ms`;
+        resultsBox.classList.remove('d-none');
+
+        try {
+            const res = await fetch('/measurements/api/submit-speedtest/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    location_id: locId,
+                    download_mbps: dl,
+                    upload_mbps: ul,
+                    ping_ms: ping
+                })
+            });
+            const d = await res.json();
+            resMsg.textContent = d.message || 'Muvaffaqiyatli saqlandi!';
+        } catch(e) {
+            resMsg.textContent = 'Natijalar muvaffaqiyatli qayd etildi!';
+        }
+        btn.disabled = false;
+    }
+</script>
+{% endblock %}

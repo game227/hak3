@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}To‘lov — Buyurtma #{{ booking.booking_code }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 max-w-2xl mx-auto">
+    <div class="zen-glass-card p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-ticket-perforated me-1"></i> Buyurtma #{{ booking.booking_code }}
+                </span>
+                <h3 class="text-white fw-bold mb-0">To‘lovni Amalga Oshirish</h3>
+            </div>
+            <span class="badge {{ booking.status_badge_class }} fs-6">{{ booking.get_status_display }}</span>
+        </div>
+
+        <!-- Booking Summary Box -->
+        <div class="p-4 bg-slate-900/90 border border-slate-800 rounded-3 mb-4">
+            <div class="row g-3 small text-slate-300">
+                <div class="col-6"><strong>Joy:</strong> <span class="text-white">{{ booking.location.name }}</span></div>
+                <div class="col-6"><strong>Stol:</strong> <span class="text-emerald-400">{% if booking.table %}#{{ booking.table.table_number }} ({{ booking.zone.name }}){% else %}Umumiy{% endif %}</span></div>
+                <div class="col-6"><strong>Sana:</strong> {{ booking.booking_date|date:"d.m.Y" }}</div>
+                <div class="col-6"><strong>Vaqt:</strong> {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }} ({{ booking.total_hours }} soat)</div>
+            </div>
+            <hr class="border-slate-800 my-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-dim">Jami to‘lov summasi:</span>
+                <span class="display-6 fw-extrabold text-emerald-400">{{ booking.total_price|floatformat:0 }} so‘m</span>
+            </div>
+        </div>
+
+        <!-- Fluid Liquid Wave Animation -->
+        <div class="liquid-wave-box mb-4 d-flex align-items-center justify-content-center">
+            <div class="liquid-wave"></div>
+            <div class="position-relative text-white small fw-bold z-index-2 d-flex align-items-center gap-2">
+                <i class="bi bi-shield-lock-fill text-emerald-400"></i> Xavfsiz Shifrlangan To‘lov Tizimi
+            </div>
+        </div>
+
+        <!-- Payment Methods Form -->
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h5 class="text-white mb-3">To‘lov usulini tanlang:</h5>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <label class="p-3 bg-slate-900 border border-slate-800 rounded-3 text-center d-block cursor-pointer hover-border-emerald">
+                        <input type="radio" name="provider" value="payme" checked class="form-check-input mb-2 d-block mx-auto">
+                        <span class="fw-bold text-white text-xs d-block">Payme</span>
+                    </label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="p-3 bg-slate-900 border border-slate-800 rounded-3 text-center d-block cursor-pointer hover-border-emerald">
+                        <input type="radio" name="provider" value="click" class="form-check-input mb-2 d-block mx-auto">
+                        <span class="fw-bold text-white text-xs d-block">Click Up</span>
+                    </label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="p-3 bg-slate-900 border border-slate-800 rounded-3 text-center d-block cursor-pointer hover-border-emerald">
+                        <input type="radio" name="provider" value="uzum" class="form-check-input mb-2 d-block mx-auto">
+                        <span class="fw-bold text-white text-xs d-block">Uzum Bank</span>
+                    </label>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="p-3 bg-slate-900 border border-slate-800 rounded-3 text-center d-block cursor-pointer hover-border-emerald">
+                        <input type="radio" name="provider" value="manual_transfer" class="form-check-input mb-2 d-block mx-auto">
+                        <span class="fw-bold text-white text-xs d-block">Karta / Chek</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Receipt Upload (if manual) -->
+            <div class="mb-4">
+                <label class="form-label text-slate-300 small">To‘lov cheki / Skrinshot (ixtiyoriy):</label>
+                <input type="file" name="receipt_image" class="form-control form-control-sm" accept="image/*">
+                <div class="text-dim text-xs mt-1">To‘lov chekini yuklasangiz, admin to‘lovni tezroq tasdiqlaydi.</div>
+            </div>
+
+            <button type="submit" class="btn btn-zen-primary btn-lg w-100 justify-content-center py-3">
+                <i class="bi bi-lock-fill me-1"></i> To‘lovni Tasdiqlash
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

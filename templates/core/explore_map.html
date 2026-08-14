@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Toshkent Ishlash Joylari Xaritasi — QuietSpace{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="text-white fw-bold mb-1"><i class="bi bi-compass text-emerald-400 me-2"></i>Toshkent Joylari Xaritasi</h2>
+            <p class="text-muted small mb-0">Jonli shovqin darajasi, internet tezligi va qulayliklar bo‘yicha interaktiv qidiruv</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'ai_service:ai_matchmaker' %}" class="btn btn-zen-cyan btn-sm">
+                <i class="bi bi-robot me-1"></i> AI Tavsiya
+            </a>
+            <a href="{% url 'core:home' %}" class="btn btn-zen-secondary btn-sm">
+                <i class="bi bi-grid me-1"></i> Ro‘yxat
+            </a>
+        </div>
+    </div>
+
+    <!-- Zen Filter Bar -->
+    <div class="zen-glass-card p-3 mb-4">
+        <form method="GET" class="row g-2 align-items-center">
+            <!-- Search Query -->
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-slate-900 border-slate-700 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control bg-slate-900 border-slate-700 text-white" placeholder="Nom yoki manzil...">
+                </div>
+            </div>
+
+            <!-- District Filter -->
+            <div class="col-md-2">
+                <select name="district" class="form-select form-select-sm bg-slate-900 border-slate-700 text-white">
+                    <option value="">Barcha tumanlar</option>
+                    {% for d_code, d_label in districts %}
+                    <option value="{{ d_code }}" {% if district_filter == d_code %}selected{% endif %}>{{ d_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Live Status Filter -->
+            <div class="col-md-2">
+                <select name="status" class="form-select form-select-sm bg-slate-900 border-slate-700 text-white">
+                    <option value="">Barcha holatlar</option>
+                    <option value="quiet" {% if status_filter == 'quiet' %}selected{% endif %}>🟢 Faqat Tinch</option>
+                    <option value="moderate" {% if status_filter == 'moderate' %}selected{% endif %}>🟡 O‘rtacha</option>
+                    <option value="busy" {% if status_filter == 'busy' %}selected{% endif %}>🔴 Gavjum</option>
+                </select>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="col-md-2">
+                <select name="category" class="form-select form-select-sm bg-slate-900 border-slate-700 text-white">
+                    <option value="">Barcha toifalar</option>
+                    {% for c_code, c_label in categories %}
+                    <option value="{{ c_code }}" {% if category_filter == c_code %}selected{% endif %}>{{ c_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Minimum Wi-Fi Speed Slider -->
+            <div class="col-md-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-dim text-xs text-nowrap">Wi-Fi:</span>
+                    <input type="range" name="min_speed" id="speed-range" min="0" max="150" step="25" value="{{ min_speed|default:0 }}" class="form-range" oninput="document.getElementById('speed-val').textContent = this.value + ' Mbps'">
+                    <span class="text-cyan-400 text-xs fw-bold text-nowrap" id="speed-val">{{ min_speed|default:0 }} Mbps</span>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-zen-primary btn-sm w-100">
+                    Filtr
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Map & Location List Grid -->
+    <div class="row g-4">
+        <!-- Interactive Leaflet Map -->
+        <div class="col-lg-8">
+            <div class="zen-glass-card p-2 overflow-hidden position-relative" style="height: 600px;">
+                <div id="tashkent-map" style="width: 100%; height: 100%; border-radius: var(--radius-md); z-index: 1;"></div>
+            </div>
+        </div>
+
+        <!-- Scrollable Locations Sidebar -->
+        <div class="col-lg-4">
+            <div class="d-flex flex-column gap-3" style="max-height: 600px; overflow-y: auto;">
+                {% for loc in locations %}
+                <div class="zen-glass-card p-3 hover-border-emerald transition-all cursor-pointer" onclick="focusOnMap({{ loc.latitude }}, {{ loc.longitude }})">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="text-white fw-bold mb-0">{{ loc.name }}</h6>
+                            <span class="text-dim text-xs">{{ loc.get_district_display }}</span>
+                        </div>
+                        <span class="badge-live-{{ loc.live_status }} text-xs">{{ loc.live_badge_text }}</span>
+                    </div>
+
+                    <div class="d-flex gap-3 text-xs mb-2">
+                        <span class="text-emerald-400"><i class="bi bi-volume-down-fill me-1"></i>{{ loc.current_db_level|floatformat:0 }} dB</span>
+                        <span class="text-cyan-400"><i class="bi bi-speedometer2 me-1"></i>{{ loc.avg_download_mbps|floatformat:0 }} Mbps</span>
+                        <span class="text-slate-300"><i class="bi bi-star-fill text-warning me-1"></i>{{ loc.rating }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-slate-800">
+                        <span class="text-white fw-bold small">{{ loc.hourly_price|floatformat:0 }} so‘m/soat</span>
+                        <a href="{% url 'core:location_detail' loc.slug %}" class="btn btn-zen-primary btn-sm py-0 px-2 text-xs">
+                            Tanlash
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="zen-glass-card p-4 text-center text-muted">
+                    Tanlangan filtrlar bo‘yicha joylar topilmadi.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let map;
+    let markers = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Init Leaflet map centered on Tashkent
+        map = L.map('tashkent-map').setView([41.311081, 69.240562], 12);
+
+        // CartoDB Dark Matter map tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap, © CARTO',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Locations Data from Django Backend
+        const locations = [
+            {% for loc in locations %}
+            {
+                id: {{ loc.id }},
+                name: "{{ loc.name|escapejs }}",
+                slug: "{{ loc.slug|escapejs }}",
+                lat: {{ loc.latitude }},
+                lng: {{ loc.longitude }},
+                status: "{{ loc.live_status }}",
+                statusText: "{{ loc.live_badge_text|escapejs }}",
+                db: {{ loc.current_db_level }},
+                speed: {{ loc.avg_download_mbps }},
+                price: "{{ loc.hourly_price|floatformat:0 }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        locations.forEach(loc => {
+            const color = loc.status === 'quiet' ? '#10b981' : (loc.status === 'moderate' ? '#fbbf24' : '#f43f5e');
+            
+            const customIcon = L.divIcon({
+                className: 'custom-map-pin',
+                html: `<div style="width: 22px; height: 22px; border-radius: 50%; background: ${color}; border: 3px solid #0b131f; box-shadow: 0 0 15px ${color};"></div>`,
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+            });
+
+            const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(map);
+            
+            const popupContent = `
+                <div style="font-family: 'Outfit', sans-serif; color: #0b131f; padding: 4px;">
+                    <h6 style="margin: 0 0 4px; font-weight: 700;">${loc.name}</h6>
+                    <div style="font-size: 11px; margin-bottom: 6px;">
+                        <span>🟢 ${loc.statusText}</span><br>
+                        <span>🎧 Shovqin: <b>${Math.round(loc.db)} dB</b></span> | 
+                        <span>⚡️ <b>${Math.round(loc.speed)} Mbps</b></span>
+                    </div>
+                    <div style="font-weight: 700; color: #059669; font-size: 12px; margin-bottom: 6px;">${loc.price} so‘m / soat</div>
+                    <a href="/location/${loc.slug}/" style="display: inline-block; background: #10b981; color: white; padding: 3px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600;">Joyni ochish</a>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+            markers.push({ lat: loc.lat, lng: loc.lng, marker: marker });
+        });
+    });
+
+    function focusOnMap(lat, lng) {
+        if (map) {
+            map.setView([lat, lng], 15, { animate: true });
+            const item = markers.find(m => Math.abs(m.lat - lat) < 0.0001 && Math.abs(m.lng - lng) < 0.0001);
+            if (item) {
+                item.marker.openPopup();
+            }
+        }
+    }
+</script>
+{% endblock %}

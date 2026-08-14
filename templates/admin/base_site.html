@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | QuietSpace Tashkent Boshqaruv{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/xyz_admin.css' %}?v=2">
+{% endblock %}
+
+{% block branding %}
+<div class="xyz-admin-mark" aria-hidden="true" style="background: linear-gradient(135deg, #10b981 0%, #38bdf8 100%);">QS</div>
+<div>
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">QuietSpace Tashkent Boshqaruv</a>
+  </h1>
+  <span class="xyz-admin-tagline" style="color: #94a3b8;">Joylar · 3D Stollar · QuietPass · To‘lovlar · AI Maslahatchi</span>
+</div>
+{% endblock %}
+
+{% block welcome-msg %}
+Salom,
+<strong>{% firstof user.get_short_name user.get_username %}</strong> (Admin).
+{% endblock %}
+
+{% block userlinks %}
+  <a href="/" target="_blank" style="color: #38bdf8; font-weight: 600;">Saytga o‘tish</a> /
+  <a href="{% url 'core:admin_payments' %}" style="color: #c084fc; font-weight: 600;">To‘lovlar paneli</a> /
+  {% if user.has_usable_password %}
+    <a href="{% url 'admin:password_change' %}">Parolni almashtirish</a> /
+  {% endif %}
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit">Chiqish</button>
+  </form>
+  {% include "admin/color_theme_toggle.html" %}
+{% endblock %}

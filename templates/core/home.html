@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}QuietSpace Tashkent — Tinch Ishlash Joylari va Kovorkinglar Ekotizimi{% endblock %}
+
+{% block content %}
+<!-- ── HERO SECTION (Atmospheric Cyber-Nature Intro) ── -->
+<section class="py-5 position-relative">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3);">
+                    <span class="status-pulse-dot quiet"></span>
+                    <span class="text-emerald-400 text-xs fw-bold text-uppercase tracking-wider">Toshkentda 6+ Sokin Joylar Faol</span>
+                </div>
+
+                <h1 class="display-4 fw-extrabold text-white mb-3" style="line-height: 1.15;">
+                    Shovqindan uzoqda, <br>
+                    <span style="background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        fokus va sokinlikda
+                    </span> ishlang
+                </h1>
+
+                <p class="lead text-muted small fs-6 mb-4 max-w-lg">
+                    Real-time shovqin darajasi (dB), tasdiqlangan Wi-Fi tezligi (Mbps) va 3D stol bron qilish orqali o‘zingizga eng mos tinch joyni toping.
+                </p>
+
+                <!-- AI Smart Search Glassmorphism Bar -->
+                <div class="ai-glass-searchbox mb-4">
+                    <form action="{% url 'ai_service:ai_matchmaker' %}" method="GET" class="d-flex align-items-center gap-2">
+                        <i class="bi bi-stars text-cyan-400 fs-5"></i>
+                        <input type="text" name="q" id="ai-search-input" class="w-100" placeholder="Chorsu atrofida 100 Mbps internet va Zoom uchun tinch joy..." required>
+                        <button type="submit" class="btn btn-zen-primary btn-sm px-4 py-2 text-nowrap">
+                            AI Qidiruv
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Quick Filter Zen Pills -->
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="text-dim text-xs">Tezkor filtrlar:</span>
+                    <a href="{% url 'core:explore_map' %}?status=quiet" class="badge rounded-pill text-decoration-none px-3 py-2" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399;">
+                        🟢 Faqat Tinch joylar
+                    </a>
+                    <a href="{% url 'core:explore_map' %}?min_speed=100" class="badge rounded-pill text-decoration-none px-3 py-2" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8;">
+                        ⚡️ 100+ Mbps Wi-Fi
+                    </a>
+                    <a href="{% url 'core:explore_map' %}?category=coworking" class="badge rounded-pill text-decoration-none px-3 py-2" style="background: rgba(192, 132, 252, 0.15); border: 1px solid rgba(192, 132, 252, 0.3); color: #c084fc;">
+                        🏢 Kovorkinglar
+                    </a>
+                    <a href="{% url 'core:explore_map' %}?category=library" class="badge rounded-pill text-decoration-none px-3 py-2" style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24;">
+                        📚 Kutubxonalar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Live Metric Preview Card -->
+            <div class="col-lg-5">
+                <div class="tilt-card-wrap">
+                    <div class="zen-glass-card p-4">
+                        <svg class="leaf-overlay" viewBox="0 0 100 100" fill="currentColor">
+                            <path d="M50 0 C20 30 20 70 50 100 C80 70 80 30 50 0 Z"/>
+                        </svg>
+
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge bg-emerald-950 text-emerald-300 border border-emerald-800 text-xs px-2 py-1 mb-1 d-inline-block">
+                                    🟢 Real-Time Jonli O‘lchov
+                                </span>
+                                <h4 class="text-white fw-bold mb-0">C-Space Chorsu</h4>
+                                <span class="text-dim text-xs"><i class="bi bi-geo-alt me-1"></i>Shayxontohur tumani, Navoiy ko‘chasi</span>
+                            </div>
+                            <span class="badge-live-quiet">🟢 Tinch & Bo‘sh</span>
+                        </div>
+
+                        <!-- Live Metrics Display -->
+                        <div class="row g-2 my-3">
+                            <div class="col-6">
+                                <div class="p-3 bg-slate-900/80 border border-slate-800/80 rounded-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-dim text-xs">Shovqin (dB):</span>
+                                        <div class="soundwave-meter">
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                        </div>
+                                    </div>
+                                    <div class="fs-4 fw-extrabold text-emerald-400">38.5 dB</div>
+                                    <div class="text-dim text-xs">Mutlaq sokinlik</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 bg-slate-900/80 border border-slate-800/80 rounded-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-dim text-xs">Internet tezligi:</span>
+                                        <i class="bi bi-wifi text-cyan-400"></i>
+                                    </div>
+                                    <div class="fs-4 fw-extrabold text-cyan-400">185 Mbps</div>
+                                    <div class="text-dim text-xs">Optik tola (Ping: 4ms)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3 Pros Snippet -->
+                        <div class="p-2 bg-slate-950/60 rounded-3 border border-slate-800/60 mb-3 small text-slate-300">
+                            <div class="text-xs text-muted mb-1 fw-bold">AI Tahlil xulosasi:</div>
+                            <div class="text-xs text-emerald-400">✓ Ovoz o‘tkazmaydigan Zoom kabinalar</div>
+                            <div class="text-xs text-emerald-400">✓ Har bir stolda 220V rozetka va Type-C</div>
+                        </div>
+
+                        <a href="{% url 'core:location_detail' 'c-space-chorsu' %}" class="btn btn-zen-primary w-100 justify-content-center py-2">
+                            <i class="bi bi-ticket-perforated me-1"></i> Joyni ko‘rish va Stol bron qilish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURED WORKSPACES (3D Tilt Cards & Live Meters) ── -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+            <div>
+                <span class="text-emerald-400 text-xs fw-bold text-uppercase tracking-wider">Toshkent Katalogi</span>
+                <h2 class="text-white fw-bold mb-1">Eng sara tinch ishlash joylari</h2>
+                <p class="text-muted small mb-0">Haqiqiy o‘lchovlar va sun’iy intellekt tomonidan tahlil qilingan joylar</p>
+            </div>
+            <a href="{% url 'core:explore_map' %}" class="btn btn-zen-secondary btn-sm">
+                Barcha joylar xaritada <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for loc in locations %}
+            <div class="col-md-6 col-lg-4">
+                <div class="tilt-card-wrap h-100">
+                    <div class="zen-glass-card h-100 d-flex flex-column justify-content-between p-4">
+                        <svg class="leaf-overlay" viewBox="0 0 100 100" fill="currentColor">
+                            <path d="M50 0 C20 30 20 70 50 100 C80 70 80 30 50 0 Z"/>
+                        </svg>
+
+                        <div>
+                            <!-- Card Header: Title & Live Badge -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h4 class="text-white fw-bold mb-1">{{ loc.name }}</h4>
+                                    <span class="text-dim text-xs"><i class="bi bi-geo-alt me-1"></i>{{ loc.get_district_display }}</span>
+                                </div>
+                                <span class="badge-live-{{ loc.live_status }}">{{ loc.live_badge_text }}</span>
+                            </div>
+
+                            <p class="text-slate-300 small mb-3 line-clamp-2" style="font-size: 0.88rem;">
+                                {{ loc.description|truncatewords:16 }}
+                            </p>
+
+                            <!-- Metrics Row -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="p-2 bg-slate-900 border border-slate-800 rounded-3 d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <span class="text-dim text-xs d-block">Shovqin:</span>
+                                            <span class="fw-bold text-emerald-400 text-sm">{{ loc.current_db_level|floatformat:0 }} dB</span>
+                                        </div>
+                                        <div class="soundwave-meter">
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 bg-slate-900 border border-slate-800 rounded-3 d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <span class="text-dim text-xs d-block">Wi-Fi:</span>
+                                            <span class="fw-bold text-cyan-400 text-sm">{{ loc.avg_download_mbps|floatformat:0 }} Mbps</span>
+                                        </div>
+                                        <i class="bi bi-speedometer2 text-cyan-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Rating & Working Hours -->
+                            <div class="d-flex justify-content-between align-items-center text-xs text-muted mb-3 pb-3 border-bottom border-slate-800">
+                                <span><i class="bi bi-star-fill text-warning me-1"></i><strong>{{ loc.rating }}</strong> ({{ loc.review_count }} sharh)</span>
+                                <span><i class="bi bi-clock me-1"></i>{{ loc.working_hours }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="d-flex align-items-center justify-content-between pt-2">
+                            <div>
+                                <span class="text-dim text-xs d-block">Soatlik narx:</span>
+                                <span class="fs-5 fw-extrabold text-white">{{ loc.hourly_price|floatformat:0 }} <small class="text-muted text-xs">so‘m</small></span>
+                            </div>
+                            <a href="{% url 'core:location_detail' loc.slug %}" class="btn btn-zen-primary btn-sm px-3">
+                                Tanlash <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5 text-muted">Hozircha joylar qo‘shilmagan.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ── GAMIFICATION ECO-GROWTH UI (3D Medallion & Tiers) ── -->
+<section class="py-5 position-relative">
+    <div class="container">
+        <div class="zen-glass-card p-4 p-md-5" style="background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.12) 0%, rgba(14, 23, 38, 0.9) 60%);">
+            <div class="row align-items-center g-4">
+                <div class="col-md-3 text-center">
+                    <div class="medallion-3d mx-auto mb-3">
+                        <i class="bi bi-tree-fill"></i>
+                    </div>
+                    <span class="zen-tier-badge tier-guru">Eco-Growth Tizimi</span>
+                </div>
+
+                <div class="col-md-6">
+                    <h3 class="text-white fw-bold mb-2">Joylarni tekshiring, ballar to‘plang va status oling!</h3>
+                    <p class="text-muted small mb-3">
+                        Borgan ishlash joyingizda internet tezligini o‘lchang (<strong>+10 ball</strong>), fotosuratli sharh qoldiring (<strong>+20 ball</strong>). Ballaringizni QuietPass chegirmalariga almashtiring!
+                    </p>
+
+                    <!-- Growth Tiers Progress Display -->
+                    <div class="d-flex justify-content-between text-xs text-slate-300 mb-2">
+                        <span>🌱 Explorer (0-100)</span>
+                        <span>🌿 Quiet Master (101-500)</span>
+                        <span>🌳 Space Guru (500+)</span>
+                    </div>
+                    <div class="zen-progress-bar mb-2">
+                        <div class="zen-progress-fill" style="width: 65%;"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 text-md-end text-center">
+                    <a href="{% url 'measurements:speedtest' %}" class="btn btn-zen-primary w-100 justify-content-center py-2 mb-2">
+                        <i class="bi bi-speedometer2 me-1"></i> Speedtest O‘tkazish
+                    </a>
+                    <a href="{% url 'core:quietpass' %}" class="btn btn-zen-secondary w-100 justify-content-center py-2 text-xs">
+                        QuietPass Obunasi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── KO‘P BERILADIGAN SAVOLLAR (FAQ & KNOWLEDGE BASE) ── -->
+<section class="py-5 position-relative border-top border-slate-800">
+    <div class="container max-w-4xl">
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-700 rounded-pill mb-2">
+                <i class="bi bi-question-circle-fill text-emerald-400"></i>
+                <span class="text-white text-xs fw-bold">Yordam Markazi & FAQ</span>
+            </div>
+            <h2 class="text-white fw-bold mb-2">Ko‘p beriladigan savollar</h2>
+            <p class="text-muted small">Toshkentdagi ishlash joylari, shovqin o‘lchovlari, 3D stollar va QuietPass bo‘yicha to‘liq javoblar</p>
+        </div>
+
+        <!-- FAQ Live Filter Search -->
+        <div class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text bg-slate-900 border-slate-700 text-slate-400">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="home-faq-search" class="form-control bg-slate-900 border-slate-700 text-white" placeholder="Savol yoki kalit so‘z yozing (masalan: shovqin, internet, 3D stol, bepul, ball)..." onkeyup="filterHomeFaq()">
+            </div>
+        </div>
+
+        <!-- FAQ Accordion List -->
+        <div class="accordion d-flex flex-column gap-3" id="homeFaqAccordion">
+            <!-- FAQ 1 -->
+            <div class="home-faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="shovqin db qanday olchanadi olchov ishonchli">
+                <h2 class="accordion-header">
+                    <button class="accordion-button bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq-1">
+                        <span class="text-emerald-400">🎧</span> Shovqin darajasi (dB) qanday o‘lchanadi va ma’lumotlar qanchalik ishonchli?
+                    </button>
+                </h2>
+                <div id="hfaq-1" class="accordion-collapse collapse show" data-bs-parent="#homeFaqAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        QuietSpace ekotizimida shovqin darajasi 2 usulda yangilanadi: hamkor joylarga o‘rnatilgan <strong>IoT shovqin sensorlari</strong> va foydalanuvchilarning real vaqtdagi mikrofon o‘lchovlari. Ma’lumotlar har 5 daqiqada yangilanadi (<strong>&lt;40 dB</strong> — mutlaq sokin, <strong>41-52 dB</strong> — qulay sokinlik, <strong>&gt;53 dB</strong> — shovqinli).
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="home-faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="3d stol tanlash bron qilish buyurtma zallari">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq-2">
+                        <span class="text-cyan-400">🪑</span> 3D Stol tanlash (Zen Micro-Booking) qanday ishlaydi?
+                    </button>
+                </h2>
+                <div id="hfaq-2" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Joy kartochkasiga kirganingizda zalning <strong>3D Izometrik xaritasi</strong> ko‘rinadi. Yashil rangda bo‘sh turgan stol ustiga bosasiz — stol Z-o‘qi bo‘yicha ko‘tariladi. Aniq rozetkaga yaqin yoki deraza oldidagi stolni oldindan o‘zingizga kafolatlab olasiz.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="home-faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="speedtest internet tezlik mbps ball toplash profil">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq-3">
+                        <span class="text-blue-400">⚡️</span> Speedtest o‘tkazib qanday ball olish mumkin?
+                    </button>
+                </h2>
+                <div id="hfaq-3" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Saytdagi <strong>Speedtest</strong> sahifasiga kirasiz va borib o‘tirgan joyingizdagi Wi-Fi tezligini o‘lchaysiz. Natija avtomatik joy bazasiga qo‘shiladi va profilingizga <strong>+10 ball</strong> beriladi. Ushbu ballarni to‘plab QuietPass chegirmalariga ega bo‘lasiz.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="home-faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="ai maslahatchi gemini chat jasur yordamchi">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq-4">
+                        <span class="text-purple-400">🤖</span> AI Maslahatchi (Jasur) qanday yordam bera oladi?
+                    </button>
+                </h2>
+                <div id="hfaq-4" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Jasur — Google Gemini AI va real ma’lumotlar bazasi asosida ishlovchi aqlli yordamchi. U sizning erkin so‘rovingizni (masalan: <i>"Chorsuda 100 Mbps internet va Zoom uchun tinch joy"</i>) tahlil qilib, xuddi jonli mutaxassis kabi eng mos joylarni solishtirib beradi.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="home-faq-item zen-glass-card p-0 border border-slate-800 rounded-3 overflow-hidden" data-keywords="b2b kovorking qoshish kafe hamkorlik joy egasi">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-slate-900/90 text-white shadow-none fw-semibold d-flex gap-2 align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#hfaq-5">
+                        <span class="text-amber-400">🏢</span> O‘z kovorkingim yoki kafemni qanday ulashim mumkin?
+                    </button>
+                </h2>
+                <div id="hfaq-5" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+                    <div class="accordion-body text-slate-300 small bg-slate-950/60 border-top border-slate-800/80">
+                        Biznes egalari uchun maxsus <strong>B2B Kabinet</strong> mavjud. Ro‘yxatdan o‘tib ariza qoldirasiz. Mutaxassislarimiz shovqin va internet sifatini tekshirib, joyingizni QuietSpace xaritasiga qo‘shishadi.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support CTA -->
+        <div class="p-3 bg-slate-900/90 border border-slate-800 rounded-3 text-center mt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="text-md-start">
+                <h6 class="text-white fw-bold mb-1">Boshqa savollaringiz bormi?</h6>
+                <p class="text-muted small mb-0">Jonli AI maslahatchimiz Jasur bilan suhbatlashing yoki Telegram botimizga yozing.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'ai_service:ai_matchmaker' %}" class="btn btn-zen-secondary btn-sm text-nowrap">
+                    🤖 AI Maslahatchi
+                </a>
+                <a href="https://t.me/QuietSpace_Tashkent_bot" target="_blank" class="btn btn-zen-cyan btn-sm text-nowrap">
+                    <i class="bi bi-telegram me-1"></i> Telegram Bot
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function filterHomeFaq() {
+    const input = document.getElementById('home-faq-search');
+    const filter = input.value.toLowerCase().trim();
+    const items = document.querySelectorAll('.home-faq-item');
+
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const keywords = item.getAttribute('data-keywords') || '';
+        if (text.includes(filter) || keywords.includes(filter)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}
