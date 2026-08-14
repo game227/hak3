@@ -112,25 +112,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # =========================================================
 # DATABASE — DATABASE_URL > PostgreSQL > SQLite
 # =========================================================
-USE_SQLITE = env_bool('USE_SQLITE', False)
 _database_url = os.getenv('DATABASE_URL', '').strip()
 
 if _database_url:
     DATABASES = {
-        'default': dj_database_url.parse(
-            _database_url,
+        'default': dj_database_url.config(
+            default=_database_url,
             conn_max_age=60,
-            ssl_require=env_bool('DB_SSL_REQUIRE', True),
+            ssl_require=False
         )
     }
-elif USE_SQLITE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
+elif os.getenv('DB_NAME') and os.getenv('DB_HOST') and not os.getenv('RENDER'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -143,6 +135,13 @@ else:
             'OPTIONS': {
                 'connect_timeout': 10,
             },
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
